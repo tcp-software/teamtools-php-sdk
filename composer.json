@@ -1,0 +1,8 @@
+{
+  "name": "teamtools/php-sdk",
+  "description": "PHP SDK for teamtools API",
+  "require": {
+    "php": ">=5.5.0",
+    "guzzlehttp/guzzle": "~6.0"
+  }
+}
