@@ -1,7 +1,7 @@
 {
   "name": "teamtools/php-sdk",
   "description": "PHP SDK for teamtools API",
-  "licence": "MIT",
+  "license": "MIT",
   "authors": [
     {
       "name": "Vladimir Stojanovic",
