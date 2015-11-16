@@ -1,6 +1,13 @@
 {
   "name": "teamtools/php-sdk",
   "description": "PHP SDK for teamtools API",
+  "licence": "MIT",
+  "authors": [
+    {
+      "name": "Vladimir Stojanovic",
+      "email": "vladimir.stojanovic@shiftplanning.com"
+    }
+  ],
   "require": {
     "php": ">=5.5.0",
     "guzzlehttp/guzzle": "~6.0"
