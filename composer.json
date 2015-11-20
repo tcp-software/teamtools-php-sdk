@@ -8,6 +8,10 @@
       "email": "vladimir.stojanovic@shiftplanning.com"
     }
   ],
+  "keywords": [
+    "sdk",
+    "teamtools"
+  ],
   "require": {
     "php": ">=5.5.0",
     "guzzlehttp/guzzle": "~6.0"
