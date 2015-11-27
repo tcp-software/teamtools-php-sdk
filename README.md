@@ -124,7 +124,7 @@ $team->save();
 If `id` is provided, update of existing team will be performed. A simpler way to update entity is shown in next section (Update team).
 ```sh
 $data = [
-    'id' => '565719f3095747906a9215f5',
+    'id'   => '565719f3095747906a9215f5',
     'name' => 'New sales team'
 ];
 
@@ -422,7 +422,7 @@ $feature->save();
 
 #### Update feature
 ```sh
-$feature = Feature::getByID('5655c5f6bffebc40078b459e');
+$feature              = Feature::getByID('5655c5f6bffebc40078b459e');
 $feature->description = 'Feature B - extended trial period.';
 
 $feature->save();
