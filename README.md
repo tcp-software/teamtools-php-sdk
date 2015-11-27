@@ -1,4 +1,4 @@
-# Teamtools SDK
+# Teamtools PHP SDK
 
 #### Installation
 
