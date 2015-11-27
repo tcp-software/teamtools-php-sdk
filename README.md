@@ -82,14 +82,14 @@ after creating this attribute, it won't be possible to create `Team` entity if `
 
 ```sh
 $data = [
-    'name' => 'department',
-    'prettyName' => 'Department',
-    'type' => 'text',
-    'description' => "Team's department",
-    'required' => true,
-    'editable' => true,
-    'searchable' => true,
-    'default' => false,
+    'name'         => 'department',
+    'prettyName'   => 'Department',
+    'type'         => 'text',
+    'description'  => "Team's department",
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
     'defaultValue' => ''
 ];
 
@@ -138,7 +138,7 @@ retrieved by `id`, or `tag` and search in which case a collection of objects wil
 are described in next section (Get teams).
 
 ```sh
-$team = Team::getByID('565719f3095747906a9215f5');
+$team       = Team::getByID('565719f3095747906a9215f5');
 $team->name = 'Aftersales team';
 
 $team->save();
@@ -188,19 +188,19 @@ PHP object (Entity or ArrayIterator when collections are returned) and raw respo
 
 * supplying `true` to instance methods
   * Update team and return raw response
-  	```sh
-	$team = Team::getByID('56582c53095747b64b9215f7');
-	$team->name = 'SDK awesome team';
+    ```sh
+    $team       = Team::getByID('56582c53095747b64b9215f7');
+    $team->name = 'SDK awesome team';
 
-	$response = $team->save(true);
-	```
+    $response   = $team->save(true);
+    ```
   * Update team and return `teamtools\Entities\Team` object
-  	```sh
-	$team = Team::getByID('56582c53095747b64b9215f7');
-	$team->name = 'SDK awesome team';
+    ```sh
+    $team       = Team::getByID('56582c53095747b64b9215f7');
+    $team->name = 'SDK awesome team';
 
-	$response = $team->save();
-	```
+    $response   = $team->save();
+    ```
 
 * calling methods with suffix `Raw` when working with static methods
   * `$team = Team::getByID('565719f3095747906a9215f5');` - returns `teamtools\Entities\Team` object
@@ -208,13 +208,13 @@ PHP object (Entity or ArrayIterator when collections are returned) and raw respo
 
 ##### Methods with corresponding "raw response" methods:
 
-Object 		    | Raw
+Object          | Raw
 ----------------|------------------
-`getByID`  	    | `getByIDRaw`
-`getByTag` 	    | `getByTagRaw`
-`getAll` 	 	| `getAllRaw`
+`getByID`       | `getByIDRaw`
+`getByTag`      | `getByTagRaw`
+`getAll`        | `getAllRaw`
 `getAttributes` | `getAttributesRaw`
-				|
+                |
 
 ### Billing package entity
 
@@ -235,14 +235,14 @@ $attributes = Package::getAttributes();
 
 ```sh
 $data = [
-    'name' => 'calculationBase',
-    'prettyName' => 'Calculation Base',
-    'type' => 'text',
-    'description' => 'Base for calculation',
-    'required' => true,
-    'editable' => true,
-    'searchable' => true,
-    'default' => false,
+    'name'         => 'calculationBase',
+    'prettyName'   => 'Calculation Base',
+    'type'         => 'text',
+    'description'  => 'Base for calculation',
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
     'defaultValue' => ''
 ];
 
@@ -254,15 +254,15 @@ Package::saveAttribute($attribute);
 
 ```sh
 $data = [
-    'id' => '5655b89bbffebc40078b4595',
-    'name' => 'Calculation Base',
-    'prettyName' => 'Calculation Base',
-    'type' => 'text',
-    'description' => 'Base for calculation changed',
-    'required' => true,
-    'editable' => true,
-    'searchable' => true,
-    'default' => false,
+    'id'           => '5655b89bbffebc40078b4595',
+    'name'         => 'Calculation Base',
+    'prettyName'   => 'Calculation Base',
+    'type'         => 'text',
+    'description'  => 'Base for calculation changed',
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
     'defaultValue' => ''
 ];
 
@@ -282,7 +282,7 @@ Package::deleteAttribute('5655bc9bbffebc40078b4598');
 
 ```sh
 $data = [
-    'name' => 'perUser',
+    'name'        => 'perUser',
     'description' => 'Billing per user',
     'packageType' => 'custom',
     'trial'       => '30',
@@ -296,13 +296,13 @@ $package->save();
 #### Create billing package with features
 ```sh
 $data = [
-    'name' => 'perUser',
-    'description' => 'Billing per user',
-    'packageType' => 'custom',
-    'trial'       => '30',
-    'calculationBase' => 'asdf',
+    'name'             => 'perUser',
+    'description'      => 'Billing per user',
+    'packageType'      => 'custom',
+    'trial'            => '30',
+    'calculationBase'  => 'asdf',
     'calculationBase2' => 'asdf',
-    'feature_ids' => [
+    'feature_ids'      => [
         '5655c5edbffebc40078b459c',
         '5655c5f6bffebc40078b459e'
     ]
@@ -356,14 +356,14 @@ use teamtools\Entities\Feature;
 use teamtools\Entities\Attribute;
 
 $data = [
-    'name' => 'status',
-    'prettyName' => 'Feature status',
-    'type' => 'number',
-    'description' => 'Status of feature',
-    'required' => true,
-    'editable' => true,
-    'searchable' => true,
-    'default' => false,
+    'name'         => 'status',
+    'prettyName'   => 'Feature status',
+    'type'         => 'number',
+    'description'  => 'Status of feature',
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
     'defaultValue' => ''
 ];
 
@@ -378,15 +378,15 @@ use teamtools\Entities\Feature;
 use teamtools\Entities\Attribute;
 
 $data = [
-    'id' => '5656c899bffebc47078b456e',
-    'name' => 'status',
-    'prettyName' => 'Feature status',
-    'type' => 'number',
-    'description' => 'Status of feature. 1 - active; 0 - inactive.',
-    'required' => true,
-    'editable' => true,
-    'searchable' => true,
-    'default' => false,
+    'id'           => '5656c899bffebc47078b456e',
+    'name'         => 'status',
+    'prettyName'   => 'Feature status',
+    'type'         => 'number',
+    'description'  => 'Status of feature. 1 - active; 0 - inactive.',
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
     'defaultValue' => ''
 ];
 
@@ -411,9 +411,9 @@ $feature = Feature::getByTag('master');
 #### Create feature
 ```sh
 $data = [
-    'name' => 'Feature B',
+    'name'        => 'Feature B',
     'description' => 'Feature B',
-    'uniqueKey' => 'feat-B'
+    'uniqueKey'   => 'feat-B'
 ];
 
 $feature = new Feature($data);
@@ -440,14 +440,14 @@ $feature->delete();
 
 ##### Update feature dependencies
 ```sh
-$feature = Feature::getByID('5655c5edbffebc40078b459c');
+$feature                 = Feature::getByID('5655c5edbffebc40078b459c');
 $feature->dependency_ids = ['5655c5f6bffebc40078b459e'];
 $feature->save();
 ```
 
 ##### Remove feature dependencies
 ```sh
-$feature = Feature::getByID('5655c5edbffebc40078b459c');
+$feature                 = Feature::getByID('5655c5edbffebc40078b459c');
 $feature->dependency_ids = [];
 $feature->save();
 ```
