@@ -7,14 +7,15 @@ use teamtools\Entities\Entity;
 class TeamToolsClient
 {
 
-    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
+    protected $authDomain = 'http://auth.teamtools.local/';
+    protected $apiDomain = 'http://api.teamtools.local/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
     protected $salt;
 
-    public static function initialize(array $config) {
+    public static function initialize(array $config)
+    {
         if (null === static::$instance) {
             static::$instance = new static($config);
         }
@@ -57,7 +58,7 @@ class TeamToolsClient
         return $this->accessObject->access_token;
     }
 
-    public function doRequest($method,$data, $uri, $resource = 'api', $decode = true)
+    public function doRequest($method, $data, $uri, $resource = 'api', $decode = true)
     {
         $requestDataType = $method == 'get' ? 'query' : 'json';
 
@@ -68,7 +69,7 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        $response        = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
         return $response->getBody();
     }
