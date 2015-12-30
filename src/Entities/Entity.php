@@ -18,6 +18,38 @@ class Entity
         }
     }
 
+    /**
+     * When entity object is constructed by ID, all attributes are initialized from database.
+     * Then we change some editable attribute and attempt to save object.
+     * This request will also contain all other attributes that were initialized from database (some of them non-editable).
+     * This way we won't be able to update single attribute if there is at least 1 non-editable attribute on entity.
+     * This is helper function that takes only editable (and existing) attributes for PUT request.
+     * Also, if attribute type is date and it's initialized from database - it needs to be flattened.
+     */
+    protected function getUpdateableAttributes()
+    {
+        $attributes = $this::getAttributes();
+        $properties = get_object_vars($this);
+        $result = [];
+
+        foreach ($attributes as $attr) {
+            if (isset($attr->editable) && $attr->editable && isset($properties[$attr->name])) {
+                $result[$attr->name] = $properties[$attr->name];
+            }
+
+            // Convert date object to string
+            if (isset($attr->type) && $attr->type == 'date' && isset($properties[$attr->name])) {
+                $dateObject = $properties[$attr->name];
+
+                if (isset($dateObject->date)) {
+                    $result[$attr->name] = $dateObject->date;
+                }
+            }
+        }
+
+        return $result;
+    }
+
     public function save($raw = false)
     {
         $attributes = get_object_vars($this);
@@ -25,7 +57,7 @@ class Entity
 
         try {
             if ($this->id) {
-                $response = static::$client->doRequest('put', $attributes, $manager::getContext() . '/' . $this->id);
+                $response = static::$client->doRequest('put', $this->getUpdateableAttributes($attributes), $manager::getContext() . '/' . $this->id);
             } else {
                 $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/');
             }
