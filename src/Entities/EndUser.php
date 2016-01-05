@@ -1,6 +1,7 @@
 <?php
 
 namespace teamtools\Entities;
+
 use GuzzleHttp\Exception\ClientException;
 use teamtools\Managers\EndUserManager;
 

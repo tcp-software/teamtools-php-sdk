@@ -1,12 +1,29 @@
 <?php
 
 namespace teamtools\Entities;
+
 use GuzzleHttp\Exception\ClientException;
 use teamtools\Managers\CustomerManager;
 
 class Customer extends Entity
 {
     protected static $manager = CustomerManager::class;
+
+    public function save($raw = false)
+    {
+        // Email has unique validator.
+        // If value passed is same as what's already in database, validator will fail.
+        // Unset email param if same as in db
+        if (isset($this->id) && isset($this->email)) {
+            $teamValidation = Customer::getByID($this->id);
+
+            if ($teamValidation->email == $this->email) {
+                unset($this->email);
+            }
+        }
+
+        return parent::save($raw);
+    }
 
     public function getEndUsers($raw = false)
     {
