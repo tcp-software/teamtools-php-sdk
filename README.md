@@ -451,3 +451,66 @@ $feature                 = Feature::getByID('5655c5edbffebc40078b459c');
 $feature->dependency_ids = [];
 $feature->save();
 ```
+
+## Plans
+
+#### Plans namespace
+To work with plans, include the following namespace:
+```sh
+use teamtools\Entities\Plan;
+```
+
+#### Get plan by ID
+```sh
+$plan = Plan::getByID('5673eff3bffebc4e078b4569');
+```
+
+#### Create plan
+```sh
+$data = [
+    'name' => 'Enterprise',
+    'packageId' => '5671392cbffebc46078b4567',
+    'trial' => '30',
+    'pricing'   => [
+        'type' => 'tier',
+        'interval' => [
+            'type' => 'month',
+            'amount' => 2],
+        'unit' => 'enduser',
+        'levels' =>
+            [[
+                'condition' => [
+                    'min' => 1,
+                    'max' => -1
+                ],
+                'expression' =>
+                    [[
+                        'type' => 'unit',
+                        'unit' => 'enduser',
+                        'amount' => 12
+
+                    ]]
+            ]]
+    ]
+];
+
+$plan = new Plan($data);
+$plan->save();
+```
+
+#### Update plan
+
+Only `allowedCustomerIds` is allowed for update on plan:
+```sh
+$plan                        = Plan::getByID('5673eff3bffebc4e078b4569');
+$plan->allowedCustomerIds[]  = ['566fd788bffebc40078b4567', '56829644bffebc48078b4576'];
+
+$plan->save();
+```
+
+#### Delete plan
+
+```sh
+$plan = Plan::getByID('5673eff3bffebc4e078b4569');
+$plan->delete();
+```
