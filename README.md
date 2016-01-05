@@ -468,26 +468,26 @@ $plan = Plan::getByID('5673eff3bffebc4e078b4569');
 #### Create plan
 ```sh
 $data = [
-    'name' => 'Enterprise2',
+    'name'      => 'Enterprise2',
     'packageId' => '5671392cbffebc46078b4567',
-    'trial' => '30',
+    'trial'     => '30',
     'pricing'   => [
-        'type' => 'tier',
-        'interval' => [
-            'type' => 'month',
+        'type'       => 'tier',
+        'interval'   => [
+            'type'   => 'month',
             'amount' => 2
         ],
-        'unit' => 'enduser',
+        'unit'   => 'enduser',
         'levels' => [
             [
-                'condition' => [
-                    'min' => 1,
-                    'max' => -1
+                'condition'  => [
+                    'min'    => 1,
+                    'max'    => -1
                 ],
                 'expression' => [
                     [
-                        'type' => 'unit',
-                        'unit' => 'enduser',
+                        'type'   => 'unit',
+                        'unit'   => 'enduser',
                         'amount' => 12
 
                     ]
