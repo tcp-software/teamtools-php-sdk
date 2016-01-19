@@ -10,12 +10,27 @@ class Entity
     protected static $manager;
     public static $client;
     public $id;
+    protected $changedProperties = [];
+    private $initializing = false;
 
     public function __construct($data)
     {
+        $this->initializing = true;
+
         foreach ($data as $attribute => $value) {
             $this->$attribute = $value;
         }
+
+        $this->initializing = false;
+    }
+
+    public function __set($name, $value)
+    {
+        if (!$this->initializing) {
+            $this->changedProperties[$name] = $value;
+        }
+        
+        $this->$name = $value;
     }
 
     /**
@@ -28,7 +43,7 @@ class Entity
      */
     protected function getUpdateableAttributes()
     {
-        $attributes = $this::getAttributes();
+        /*$attributes = $this::getAttributes();
         $properties = get_object_vars($this);
         $result = [];
 
@@ -47,7 +62,9 @@ class Entity
             }
         }
 
-        return $result;
+        return $result;*/
+
+        return $this->changedProperties;
     }
 
     public function save($raw = false)
@@ -57,7 +74,7 @@ class Entity
 
         try {
             if ($this->id) {
-                $response = static::$client->doRequest('put', $this->getUpdateableAttributes($attributes), $manager::getContext() . '/' . $this->id);
+                $response = static::$client->doRequest('put', $this->getUpdateableAttributes(), $manager::getContext() . '/' . $this->id);
             } else {
                 $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/');
             }
