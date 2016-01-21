@@ -43,6 +43,12 @@ TeamToolsClient::initialize([
 
 If the authentication is successful, from now on we can make calls to SDK methods. 
 
+#### Retrieving access token
+If access token is needed for making additional requests to TeamTools API, it can be retrieved after registering client, like this:
+```sh
+$accessToken = TeamToolsClient::getInstance()->getAccessToken();
+```
+
 
 ### Team entity
 
