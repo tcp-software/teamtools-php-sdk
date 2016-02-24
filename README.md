@@ -523,3 +523,109 @@ $plan->save();
 $plan = Plan::getByID('5673eff3bffebc4e078b4569');
 $plan->delete();
 ```
+
+## Subscriptions
+
+#### Subscribe customer to plan
+
+Customer can be subscribed to plan through package: if customer is contained in `allowedCustomerIds` in some plan, than customer will be subscribed to that plan. Otherwise, it gets subscription to default plan from passed package. If customer has payment gateway defined, request for subscription will be also sent to gateway. Return value: `subscription` object.
+
+```
+use teamtools\Entities\Customer;
+use teamtools\Entities\Package;
+
+...
+
+$customer = Customer::getByID('56c73ce5bffebc47078b4619');
+var_dump($customer->subscribe(['packageId' => '56c46c5bbffebcd4038b458a']));
+```
+
+#### Unsubscribe customer from plan
+
+By calling following SDK function customer will be unsubscribed from current plan. If subscription exists on payment gateway, it will also be cancelled.
+Return value: `subscription` object.
+
+```
+use teamtools\Entities\Customer;
+
+...
+
+$customer = Customer::getByID('56c73ce5bffebc47078b4619');
+var_dump($customer->unsubscribe());
+```
+
+#### Add invoice item
+Invoice item can be added and picked up by next invoice generation. If subscription exist on payment gateway, invoice item will be created on gateway. Otherwise it's created in TeamTools database.
+
+```
+use teamtools\Entities\Subscription;
+
+$data = [
+    'description' => 'This item will appear on next invoice',
+    'currency'    => 'usd',
+    'amount'      => 1800
+];
+
+$subscription = Subscription::getByID('56cc46f2bffebc5b078b4571');
+$subscription->addInvoiceItem($data);
+```
+
+## Invoices
+
+#### Get invoice by ID
+
+```
+use teamtools\Entities\Invoice;
+
+$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+```
+
+#### Create invoice
+
+```
+use teamtools\Entities\Invoice;
+
+$data = [
+    'invoiceDate' => '2016-01-22',
+    'dueDate'     => '2016-02-22',
+    'customerId'  => '56c73ce5bffebc47078b4619',
+    'items'       => [
+        [
+            'description' => 'Initial account setup',
+            'amount'      => 1750
+        ],
+        [
+            'description' => 'Application adjustments',
+            'amount'      => 450000
+        ]
+    ]
+];
+
+$invoice = new Invoice($data);
+$invoice->save()
+```
+
+#### Settle invoice
+
+Used to manually mark invoice as settled.
+
+```
+use teamtools\Entities\Invoice;
+
+$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+$invoice->settle();
+$invoice->save();
+
+```
+
+#### Apply payment on invoice
+
+Manually apply payment to invoice total. If applied amount is equals to invoice total, invoice will be marked as paid. If amount is larger than open invoice amount, invoice will be closed and remaining amount added to balance on subscription object.
+
+```
+use teamtools\Entities\Invoice;
+
+$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+$invoice->applyPayment(['amount' => 350]);
+$invoice->save();
+```

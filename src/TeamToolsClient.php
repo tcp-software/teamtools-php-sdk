@@ -3,14 +3,16 @@
 namespace teamtools;
 
 use teamtools\Entities\Entity;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 
 class TeamToolsClient
 {
 
-    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
-    // protected $authDomain = 'http://auth.teamtools.local/';
-    // protected $apiDomain = 'http://api.teamtools.local/';
+    //protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
+    //protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
+    protected $authDomain = 'http://auth.teamtools.local/';
+    protected $apiDomain = 'http://api.teamtools.local/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
@@ -71,7 +73,13 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        try {
+            $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        } catch (ClientException $ce) {
+            die($ce->getResponse()->getBody());
+        } catch (ServerException $se) {
+            die($se->getResponse()->getBody());
+        }
 
         return $response->getBody();
     }
