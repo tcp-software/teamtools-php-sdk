@@ -75,4 +75,54 @@ class Customer extends Entity
 
         return new \ArrayIterator($result);
     }
+
+    public function subscribe(array $data, $raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        try {
+            $response = static::$client->doRequest('put', $data, $manager::getContext() . '/' . $this->id . '/subscribe');
+        } catch (ClientException $ce) {
+            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
+            return $response;
+        }
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
+
+    public function unsubscribe($raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        try {
+            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/unsubscribe');
+        } catch (ClientException $ce) {
+            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
+            return $response;
+        }
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
 }
