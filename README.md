@@ -620,7 +620,7 @@ $invoice->save();
 
 #### Apply payment on invoice
 
-Manually apply payment to invoice total. If applied amount is equals to invoice total, invoice will be marked as paid. If amount is larger than open invoice amount, invoice will be closed and remaining amount added to balance on subscription object.
+Manually apply payment to invoice total. If applied amount is equal to invoice total, invoice will be marked as paid. If amount is larger than open invoice amount, invoice will be closed and remaining amount added to balance on subscription object.
 
 ```
 use teamtools\Entities\Invoice;
