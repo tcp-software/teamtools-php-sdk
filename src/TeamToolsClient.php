@@ -11,10 +11,10 @@ class TeamToolsClient
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
 
-    //protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-    //protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
-    protected $authDomain = 'http://auth.teamtools.local/';
-    protected $apiDomain = 'http://api.teamtools.local/';
+    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
+    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
+    // protected $authDomain = 'http://auth.teamtools.local/';
+    // protected $apiDomain = 'http://api.teamtools.local/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
