@@ -629,3 +629,19 @@ $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
 $invoice->applyPayment(['amount' => 350]);
 $invoice->save();
 ```
+
+
+#### Forward data from Stripe webhook
+In order to enable TeamTools to handle Stripe events, data received from Stripe should be forwarded to TeamTools. This is achieved by calling method `handleStripe()` in third-party endpoint which is defined as Stripe webhook.
+
+```
+use teamtools\TeamToolsClient;
+
+TeamToolsClient::initialize([
+    'client_id'     => 'iQ7Xz1x2A6',
+    'client_secret' => 'pOM6HnoC',
+    'salt'          => 'asdf'
+]);
+
+TeamToolsClient::handleStripe();
+```
