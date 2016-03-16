@@ -9,10 +9,12 @@ use GuzzleHttp\Exception\ServerException;
 class TeamToolsClient
 {
 
-    //protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-    //protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
-    protected $authDomain = 'http://auth.teamtools.local/';
-    protected $apiDomain = 'http://api.teamtools.local/';
+    const STRIPE_HANDLER_ENDPOINT = 'stripe';
+
+    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
+    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
+    // protected $authDomain = 'http://auth.teamtools.local/';
+    // protected $apiDomain = 'http://api.teamtools.local/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
@@ -34,6 +36,16 @@ class TeamToolsClient
         }
 
         return static::$instance;
+    }
+
+    public static function handleStripe()
+    {
+        $client = static::getInstance();
+
+        $input = file_get_contents('php://input');
+        $event = json_decode($input, true);
+
+        return $client->doRequest('post', $event, TeamToolsClient::STRIPE_HANDLER_ENDPOINT);
     }
 
     protected function __construct(array $config)
