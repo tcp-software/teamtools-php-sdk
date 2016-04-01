@@ -45,7 +45,7 @@ class Event extends Entity
 
     public function getSaveKey()
     {
-        return md5($this->endUser . static::$client->getSalt());
+        return md5($this->endUserId . static::$client->getSalt());
     }
 
     public static function __callStatic($name, $arguments)
