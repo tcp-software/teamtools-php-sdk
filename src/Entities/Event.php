@@ -14,6 +14,7 @@ class Event extends Entity
     public $endUser;
     public $endUserId;
     public $endUserName;
+    public $counter;
     public $timestamp;
     public $metadata;
 
