@@ -50,7 +50,19 @@ class TeamToolsClient
 
     protected function __construct(array $config)
     {
-        $this->guzzleClient = new \GuzzleHttp\Client();
+        if (isset($config['http_client'])) {
+            $httpClient = $config['http_client'];
+
+            if (is_array($httpClient)) {
+                $httpClient = new \GuzzleHttp\Client($httpClient);
+            } elseif (! $httpClient instanceof \GuzzleHttp\Client) {
+                throw new \InvalidArgumentException();
+            }
+        } else {
+            $httpClient = new \GuzzleHttp\Client();
+        }
+
+        $this->guzzleClient = $httpClient;
         $this->salt = $config['salt'];
 
         $authData = [
