@@ -645,3 +645,73 @@ TeamToolsClient::initialize([
 
 TeamToolsClient::handleStripe();
 ```
+
+#### Bulk insert and update
+
+Customers and Endusers support bulk operations like inserting and updating multiple records in single request. For this operation a structure named "data" should be provided, which contains array of entities to be persisted. If array element contains element "id", entity with that specific ID will be updated. Otherwise, entity will be inserted. All validations are still valid, like when working with single entity.
+
+Customers example:
+
+```
+use teamtools\Entities\Customer;
+
+$customers = [
+    'data' => [
+        [
+            'id' => '5704f67cbffebc47078b4574',
+            'name' => 'My Customer XXY',
+            'email' => 'customerCHANGE@email.com',
+            'phone' => '+1234123412',
+            'country' => 'USA',
+            'city' => 'Chicago',
+        ],
+        [
+            'name' => 'My Customer YXY',
+            'email' => 'customer@email.com',
+            'phone' => '+1234123412',
+            'country' => 'USA',
+            'city' => 'Chicago'
+        ]
+    ]
+];
+
+var_dump(Customer::saveAll($customers, false));
+
+```
+
+Endusers example:
+```
+use teamtools\Entities\EndUser;
+
+$endusers = [
+    'data' => [
+        [
+            'firstName' => 'Mary',
+            'lastName'  => 'Jones',
+            'email'     => 'customerCHANGE@email.com',
+            'phone'     => '+1234123412',
+            'country'   => 'USA',
+            'city'      => 'Chicago'
+        ],
+        [
+            'firstName' => 'Peter',
+            'lastName'  => 'Johnson',
+            'email'     => 'customer@email.com',
+            'phone'     => '+1234123412',
+            'country'   => 'USA',
+            'city'      => 'Chicago'
+        ],
+        [
+            'id'        => '57050433bffebc46078b457f',
+            'firstName' => 'John',
+            'lastName'  => 'Smith',
+            'email'     => 'customer@email.com',
+            'phone'     => '+1234123412',
+            'country'   => 'USA',
+            'city'      => 'Chicago'
+        ]
+    ]
+];
+
+var_dump(EndUser::saveAll($endusers, false));
+```
