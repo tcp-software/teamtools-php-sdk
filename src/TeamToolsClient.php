@@ -97,13 +97,7 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        try {
-            $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
-        } catch (ClientException $ce) {
-            die($ce->getResponse()->getBody());
-        } catch (ServerException $se) {
-            die($se->getResponse()->getBody());
-        }
+        $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
         return $response->getBody();
     }
