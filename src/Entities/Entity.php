@@ -63,7 +63,7 @@
             $manager  = static::$manager;
 
             try {
-                $response = static::$client->doRequest('post', $data, $manager::getContext() . '/bulk');
+                $response = static::$client->doRequest('post', ['data' => $data], $manager::getContext() . '/bulk');
             } catch (ClientException $ce) {
                 $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
             }
