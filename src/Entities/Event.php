@@ -27,21 +27,23 @@ class Event extends Entity
 
         try {
             if (!$this->id) {
-                $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/');
+                $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/', true);
             }
         } catch (ClientException $ce) {
             $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
             return $response;
         }
 
-        if ($raw) {
-            return (string) $response;
-        }
+        return $response;
 
-        $responseObject = json_decode($response);
-        $data           = get_object_vars($responseObject->data);
-
-        return new static($data);
+        //        if ($raw) {
+        //            return (string) $response;
+        //        }
+        //
+        //        $responseObject = json_decode($response);
+        //        $data           = get_object_vars($responseObject->data);
+        //
+        //        return new static($data);
     }
 
     public function getSaveKey()
