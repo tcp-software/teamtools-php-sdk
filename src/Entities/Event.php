@@ -27,7 +27,7 @@ class Event extends Entity
 
         try {
             if (!$this->id) {
-                $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/', true);
+                $response = static::$client->doRequest('post', $attributes, $manager::getContext() . '/', 'api', true);
             }
         } catch (ClientException $ce) {
             $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
