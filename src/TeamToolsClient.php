@@ -102,8 +102,10 @@ class TeamToolsClient
 
         if ($async) {
             $method .= 'Async';
-            $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+            $promise = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
+            $promise->wait();
+            
             return true;
         } else {
             $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
