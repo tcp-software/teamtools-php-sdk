@@ -11,10 +11,8 @@ class TeamToolsClient
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
 
-//    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-//    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
-    protected $authDomain = 'http://auth.teamtools.io/';
-    protected $apiDomain = 'http://api.teamtools.io/';
+    protected $authDomain   = 'http://auth.teamtools.io/';
+    protected $apiDomain    = 'http://api.teamtools.io/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
@@ -70,6 +68,11 @@ class TeamToolsClient
             'client_secret' => $config['client_secret'],
             'grant_type'    => 'client_credentials'
         ];
+
+        if (isset($config['test']) && $config['test']) {
+            $this->authDomain   = 'http://develop-auth.dev.teamtools.io/';
+            $this->apiDomain    = 'http://develop-api.dev.teamtools.io/';
+        }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');
 
