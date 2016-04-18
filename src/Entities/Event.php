@@ -21,7 +21,7 @@ class Event extends Entity
 
     public function save($raw = false)
     {
-        $attributes        = get_object_vars($this);
+        $attributes        = $this->attributes;
         $manager           = static::$manager;
         $attributes['key'] = $this->getSaveKey();
 
@@ -48,7 +48,7 @@ class Event extends Entity
 
     public function getSaveKey()
     {
-        return md5($this->endUserId . static::$client->getSalt());
+        return md5($this->attributes['endUserId'] . static::$client->getSalt());
     }
 
     public static function __callStatic($name, $arguments)
