@@ -11,10 +11,8 @@ class TeamToolsClient
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
 
-    protected $authDomain = 'http://develop-auth.dev.teamtools.io/';
-    protected $apiDomain = 'http://develop-api.dev.teamtools.io/';
-    // protected $authDomain = 'http://auth.teamtools.local/';
-    // protected $apiDomain = 'http://api.teamtools.local/';
+    protected $authDomain   = 'https://auth.teamtools.io/';
+    protected $apiDomain    = 'https://api.teamtools.io/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
@@ -50,7 +48,19 @@ class TeamToolsClient
 
     protected function __construct(array $config)
     {
-        $this->guzzleClient = new \GuzzleHttp\Client();
+        if (isset($config['http_client'])) {
+            $httpClient = $config['http_client'];
+
+            if (is_array($httpClient)) {
+                $httpClient = new \GuzzleHttp\Client($httpClient);
+            } elseif (! $httpClient instanceof \GuzzleHttp\Client) {
+                throw new \InvalidArgumentException();
+            }
+        } else {
+            $httpClient = new \GuzzleHttp\Client();
+        }
+
+        $this->guzzleClient = $httpClient;
         $this->salt = $config['salt'];
 
         $authData = [
@@ -58,6 +68,11 @@ class TeamToolsClient
             'client_secret' => $config['client_secret'],
             'grant_type'    => 'client_credentials'
         ];
+
+        if (isset($config['test']) && $config['test']) {
+            $this->authDomain   = 'http://develop-auth.dev.teamtools.io/';
+            $this->apiDomain    = 'http://develop-api.dev.teamtools.io/';
+        }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');
 
@@ -74,7 +89,7 @@ class TeamToolsClient
         return $this->accessObject->access_token;
     }
 
-    public function doRequest($method, $data, $uri, $resource = 'api', $decode = true)
+    public function doRequest($method, $data, $uri, $resource = 'api', $async = false)
     {
         $requestDataType = $method == 'get' ? 'query' : 'json';
 
@@ -85,14 +100,18 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        try {
+        if ($async) {
+            $method .= 'Async';
+            $promise = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+
+            $promise->wait();
+            
+            return true;
+        } else {
             $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
-        } catch (ClientException $ce) {
-            die($ce->getResponse()->getBody());
-        } catch (ServerException $se) {
-            die($se->getResponse()->getBody());
+
+            return $response->getBody();
         }
 
-        return $response->getBody();
     }
 }

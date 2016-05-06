@@ -125,4 +125,51 @@ class Customer extends Entity
 
         return new \ArrayIterator($result);
     }
+
+    public function restore($raw = false)
+    {
+        $manager = static::$manager;
+
+        try {
+            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/restore');
+        } catch (ClientException $ce) {
+            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
+            return $response;
+        }
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+        $data           = get_object_vars($responseObject->data);
+
+        return new static($data);
+    }
+
+    public static function restoreAll(array $ids, $raw = false)
+    {
+        $manager = static::$manager;
+        $result   = [];
+
+        try {
+            $response = static::$client->doRequest('put', ['ids' => $ids], $manager::getContext().'/restore');
+        } catch (ClientException $ce) {
+            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
+            return $response;
+        }
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $entity) {
+            $data     = get_object_vars($entity);
+            $result[] = new static($data);
+        }
+
+        return new \ArrayIterator($result);
+    }
 }
