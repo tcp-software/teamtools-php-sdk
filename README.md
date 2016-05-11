@@ -439,15 +439,15 @@ Example creating unit plan:
 ```
 $data = [
     'packageId' => '57330639bffebc46088b4579',
-    'trial' => '30',
-    'currency' => 'USD',
+    'trial'     => '30',
+    'currency'  => 'USD',
     'pricing'   => [
         'type' => 'unit',
         'interval' => [
             'type' => 'month',
             'amount' => 2
         ],
-        'unit' => 'enduser',
+        'unit'   => 'enduser',
         'amount' =>  200    //amount in cents
     ]
 ];
@@ -455,14 +455,30 @@ $data = [
 $plan = new Plan($data);
 var_dump($plan->save());
 ```
-# Provide example for flat plan
+Example creating flat plan:
+```
+$data = [
+    'name'      => 'Enterprise',
+    'packageId' => '57330639bffebc46088b4579',
+    'trial' => '30',
+    'currency'  => 'USD',
+    'pricing'   => [
+        'type' => 'flat',
+        'interval' => [
+            'type' => 'month',
+            'amount' => 2
+        ],
+        'amount' =>  1500
+    ]
+];
+```
 
 Example creating tier plan: 
 ```
 $data = [
     'packageId' => '57330639bffebc46088b4579',
-    'trial' => '30',
-    'currency' => 'USD',
+    'trial'     => '30',
+    'currency'  => 'USD',
     'pricing'   => [
         'type' => 'tier',
         'interval' => [
