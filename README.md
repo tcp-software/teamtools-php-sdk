@@ -498,14 +498,6 @@ Get plan by ID:
 $plan = Plan::getByID('5673eff3bffebc4e078b4569');
 ```
 
-Delete plan:
-
-```sh
-$plan = Plan::getByID('5673eff3bffebc4e078b4569');
-$plan->delete();
-```
-
-
 #### Start subscribing Customer to a Package
 
 There are two ways to create customer subscription: via customer create / update request and through dedicated endpoint. 
@@ -733,6 +725,12 @@ $endusers = [
 var_dump(EndUser::saveAll($endusers, false));
 ```
 
+### Retrieve webhook event
+```
+$webEvent = WebEvent::getByID('57334232bffebc77088b4574');
+var_dump($webEvent);
+```
+
 ### Webhook event format examples
 
 Customer name updated:
@@ -793,7 +791,76 @@ Customer name updated:
 }
 ```
 
-Group updated:
+Group created:
+```
+{
+    "_id" : ObjectId("57332e6dbffebc78088b4573"),
+    "timestamp" : ISODate("2016-05-11T13:06:53.000Z"),
+    "source" : "API",
+    "memberId" : null,
+    "url" : "http://webhookurl.com",
+    "action" : "created",
+    "data" : {
+        "type" : "group",
+        "value" : {
+            "id" : "57332e6dbffebc78088b4571",
+            "default" : true,
+            "updated_at" : {
+                "date" : "2016-05-11 13:06:53.000000",
+                "timezone_type" : NumberLong(3),
+                "timezone" : "UTC"
+            },
+            "created_at" : {
+                "date" : "2016-05-11 13:06:53.000000",
+                "timezone_type" : NumberLong(3),
+                "timezone" : "UTC"
+            },
+            "tags" : [],
+            "defaultPackageId" : null
+        },
+        "old" : null
+    },
+    "status" : "ok",
+    "updated_at" : ISODate("2016-05-11T13:06:53.590Z"),
+    "created_at" : ISODate("2016-05-11T13:06:53.590Z")
+}
 ```
 
+Package deleted:
 ```
+{
+    "_id" : ObjectId("57334232bffebc77088b4574"),
+    "timestamp" : ISODate("2016-05-11T14:31:14.000Z"),
+    "source" : "API",
+    "memberId" : null,
+    "url" : "http://webhookurl.com",
+    "action" : "deleted",
+    "data" : {
+        "type" : "package",
+        "value" : {
+            "id" : "5733052dbffebc46088b456b",
+            "name" : "Basic package",
+            "default" : false,
+            "updated_at" : {
+                "date" : "2016-05-11 10:10:53.000000",
+                "timezone_type" : NumberLong(3),
+                "timezone" : "UTC"
+            },
+            "created_at" : {
+                "date" : "2016-05-11 10:10:53.000000",
+                "timezone_type" : NumberLong(3),
+                "timezone" : "UTC"
+            },
+            "groupId" : "573301dbbffebc46088b4567",
+            "deleted_at" : "2016-05-11 14:31:14",
+            "tags" : [],
+            "featureIds" : []
+        },
+        "old" : null
+    },
+    "status" : "ok",
+    "updated_at" : ISODate("2016-05-11T14:31:14.336Z"),
+    "created_at" : ISODate("2016-05-11T14:31:14.336Z")
+}
+```
+
