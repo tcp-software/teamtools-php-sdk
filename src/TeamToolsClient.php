@@ -70,8 +70,8 @@ class TeamToolsClient
         ];
 
         if (isset($config['test']) && $config['test']) {
-            $this->authDomain   = 'http://develop-auth.dev.teamtools.io/';
-            $this->apiDomain    = 'http://develop-api.dev.teamtools.io/';
+            $this->authDomain   = 'https://develop-auth.dev.teamtools.io/';
+            $this->apiDomain    = 'https://develop-api.dev.teamtools.io/';
         }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');
