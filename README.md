@@ -228,6 +228,14 @@ teamtools subscription platform has following elements Groups, Packages, Plans w
 For technical reference, check our [API Documentation](https://dash.readme.io/project/teamtools/v1.0/docs/getting-started).
 
 ### Groups, Packages and Plans
+#### Groups, Packages and Plans namespaces:
+To work with groups, packages or plans, include respective namespace:
+```sh
+use teamtools\Entities\Group;
+use teamtools\Entities\Package;
+use teamtools\Entities\Plan;
+```
+
 #### Step 1: Create Group
 To start, you'll need to create Group, using API or directly on teamtools dashboard. Group should help you merge Packages you want to associate together. Group of Packages has its purpose when you want to assign Customers only to the Packages which belong to the one specific group.
 Also, if you want to assign your Customers to default set of Packages (without providing specific PackageId), you will have possibility to set default Group, 
@@ -237,9 +245,6 @@ Also, if you want to assign your Customers to default set of Packages (without p
 
 Code example: 
 ```
-use teamtools\Entities\Group;
-...
-
 $data = [
     'name'    => 'Standard group',
     'default' => true   //if ommited and this is first group in the system, group will become default
@@ -249,17 +254,23 @@ $group = new Group($data);
 var_dump($group->save());
 ``` 
 
-# Provide example with default package
+Example with default package and promotion to default group:
 
 ```
 $data = [
-    'name'           => 'Standard group',
-    'defaultPackage' => 'xxxx',
-    'default'        => false
+    'name'           => 'Basic group',
+    'defaultPackage' => '5733052dbffebc46088b456b',
+    'default'        => true
 ];
 
 $group = new Group($data);
 var_dump($group->save());
+```
+
+Retrieve packages by group ID:
+```
+$group = Group::getByID('573301dbbffebc46088b4567');
+var_dump($group->getPackages());
 ```
 
 #### Step 2: Create Packages
@@ -272,7 +283,6 @@ Further, you'll need to create Package, using API or directly on teamtools dashb
 
 Code example:
 ```
-use teamtools\Entities\Package;
 $data = [
     'name'       => 'Basic package',
     'groupId'    => 'xxx'
@@ -329,9 +339,6 @@ Pricing model defines how price is calculated, it also includes definition of pr
 
 Example creating unit plan:
 ```
-use teamtools\Entities\Plan;
-...
-
 $data = [
     'name' => 'Enterprise',
     'packageId' => '57330639bffebc46088b4579',
@@ -354,9 +361,6 @@ var_dump($plan->save());
 
 Example creating tier plan: 
 ```
-use teamtools\Entities\Plan;
-...
-
 $data = [
     'name' => 'Enterprise',
     'packageId' => '57330639bffebc46088b4579',
@@ -409,15 +413,89 @@ var_dump($plan->save());
 > - 21 - 50 users: $ 35 flat/ per month
 > You would create new Custom Package, with Pricing model - tier, price defined per tier level, per month.
 
-
-### Start subscribing Customer to a Package
-
-There are two ways to create customer subscription: via customer create / update request and through dedicated endpoint.
-
-Create subscription using customer update request:
+#### Get plan by ID
+```sh
+$plan = Plan::getByID('5673eff3bffebc4e078b4569');
 ```
 
+#### Delete plan
+
+```sh
+$plan = Plan::getByID('5673eff3bffebc4e078b4569');
+$plan->delete();
 ```
+
+
+#### Start subscribing Customer to a Package
+
+There are two ways to create customer subscription: via customer create / update request and through dedicated endpoint. 
+
+Create subscription using customer update request (returns `customer` in response):
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+$customer->groupId = 'default';
+
+var_dump($customer->save());
+```
+
+Create subscription using dedicated endpoint (default group). Returns `subscription` in response:
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+
+$subscriptionData = [
+    'groupId' => 'default'
+];
+
+var_dump($customer->subscribe($subscriptionData));
+```
+
+Create subscription using dedicated endpoint:
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+
+$subscriptionData = [
+    'groupId'     => '573301dbbffebc46088b4567',
+    'packageId'   => '5733052dbffebc46088b456b',
+    'manual'      => 'false',
+    'stripeToken' => 'xxxx'
+];
+
+var_dump($customer->subscribe($subscriptionData));
+```
+
+Retrieve customer's subscription
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+var_dump($customer->getSubscription());
+```
+
+#### Unsubscribe customer from plan
+
+By calling following SDK function customer will be unsubscribed from current plan. If subscription exists on payment gateway, it will also be cancelled.
+Return value: `subscription` object.
+
+```
+$customer = Customer::getByID('56c73ce5bffebc47078b4619');
+var_dump($customer->unsubscribe());
+```
+
+#### Add invoice item
+Invoice item can be added and picked up by next invoice generation. If subscription exist on payment gateway, invoice item will be created on gateway. Otherwise it's created in TeamTools database.
+
+```
+use teamtools\Entities\Subscription;
+
+$data = [
+    'description' => 'This item will appear on next invoice',
+    'currency'    => 'usd',
+    'amount'      => 1800
+];
+
+$subscription = Subscription::getByID('56cc46f2bffebc5b078b4571');
+$subscription->addInvoiceItem($data);
+```
+
+
 
 > **Gateway Settings** 
 
@@ -431,124 +509,7 @@ Also, in order to enable teamtools to handle Gateway Events, all data received f
 
 
 ------------------------------------------------------------ billing v1 ---------------------------------------
-### Billing package entity
 
-#### Billing package namespace
-```sh
-use teamtools\Entities\Package;
-```
-
-#### Get billing package attributes
-
-```sh
-$attributes = Package::getAttributes();
-```
-
-#### Create billing package attributes
-
-
-
-```sh
-$data = [
-    'name'         => 'calculationBase',
-    'prettyName'   => 'Calculation Base',
-    'type'         => 'text',
-    'description'  => 'Base for calculation',
-    'required'     => true,
-    'editable'     => true,
-    'searchable'   => true,
-    'default'      => false,
-    'defaultValue' => ''
-];
-
-$attribute = new Attribute($data);
-Package::saveAttribute($attribute);
-```
-
-#### Update billing package attributes
-
-```sh
-$data = [
-    'id'           => '5655b89bbffebc40078b4595',
-    'name'         => 'Calculation Base',
-    'prettyName'   => 'Calculation Base',
-    'type'         => 'text',
-    'description'  => 'Base for calculation changed',
-    'required'     => true,
-    'editable'     => true,
-    'searchable'   => true,
-    'default'      => false,
-    'defaultValue' => ''
-];
-
-$attribute = new Attribute($data);
-Package::saveAttribute($attribute);
-```
-
-#### Delete billing package attribute
-
-```sh
-Package::deleteAttribute('5655bc9bbffebc40078b4598');
-```
-
-### Billing package entity
-
-#### Creating billing packages
-
-```sh
-$data = [
-    'name'        => 'perUser',
-    'description' => 'Billing per user',
-    'packageType' => 'custom',
-    'trial'       => '30',
-];
-
-$package = new Package($data);
-$package->save();
-
-```
-
-#### Create billing package with features
-```sh
-$data = [
-    'name'             => 'perUser',
-    'description'      => 'Billing per user',
-    'packageType'      => 'custom',
-    'trial'            => '30',
-    'calculationBase'  => 'asdf',
-    'calculationBase2' => 'asdf',
-    'feature_ids'      => [
-        '5655c5edbffebc40078b459c',
-        '5655c5f6bffebc40078b459e'
-    ]
-];
-
-$package = new Package($data);
-
-$package->save();
-```
-
-#### Retrieving billing packages
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-```
-
-#### Updating billing package
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-
-$package->description = 'New package description';
-$package->save();
-```
-
-#### Deleting billing package
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-$package->delete();
-```
 
 ## Features
 
@@ -673,110 +634,6 @@ $feature->save();
 To work with plans, include the following namespace:
 ```sh
 use teamtools\Entities\Plan;
-```
-
-#### Get plan by ID
-```sh
-$plan = Plan::getByID('5673eff3bffebc4e078b4569');
-```
-
-#### Create plan
-```sh
-$data = [
-    'name'      => 'Enterprise2',
-    'packageId' => '5671392cbffebc46078b4567',
-    'trial'     => '30',
-    'pricing'   => [
-        'type'       => 'tier',
-        'interval'   => [
-            'type'   => 'month',
-            'amount' => 2
-        ],
-        'unit'   => 'enduser',
-        'levels' => [
-            [
-                'condition'  => [
-                    'min'    => 1,
-                    'max'    => -1
-                ],
-                'expression' => [
-                    [
-                        'type'   => 'unit',
-                        'unit'   => 'enduser',
-                        'amount' => 12
-
-                    ]
-                ]
-            ]
-        ]
-    ]
-];
-
-$plan = new Plan($data);
-$plan->save();
-```
-
-#### Update plan
-
-Only `allowedCustomerIds` is allowed for update on plan:
-```sh
-$plan                        = Plan::getByID('5673eff3bffebc4e078b4569');
-$plan->allowedCustomerIds[]  = ['566fd788bffebc40078b4567', '56829644bffebc48078b4576'];
-
-$plan->save();
-```
-
-#### Delete plan
-
-```sh
-$plan = Plan::getByID('5673eff3bffebc4e078b4569');
-$plan->delete();
-```
-
-## Subscriptions
-
-#### Subscribe customer to plan
-
-Customer can be subscribed to plan through package: if customer is contained in `allowedCustomerIds` in some plan, than customer will be subscribed to that plan. Otherwise, it gets subscription to default plan from passed package. If customer has payment gateway defined, request for subscription will be also sent to gateway. Return value: `subscription` object.
-
-```
-use teamtools\Entities\Customer;
-use teamtools\Entities\Package;
-
-...
-
-$customer = Customer::getByID('56c73ce5bffebc47078b4619');
-var_dump($customer->subscribe(['packageId' => '56c46c5bbffebcd4038b458a']));
-```
-
-#### Unsubscribe customer from plan
-
-By calling following SDK function customer will be unsubscribed from current plan. If subscription exists on payment gateway, it will also be cancelled.
-Return value: `subscription` object.
-
-```
-use teamtools\Entities\Customer;
-
-...
-
-$customer = Customer::getByID('56c73ce5bffebc47078b4619');
-var_dump($customer->unsubscribe());
-```
-
-#### Add invoice item
-Invoice item can be added and picked up by next invoice generation. If subscription exist on payment gateway, invoice item will be created on gateway. Otherwise it's created in TeamTools database.
-
-```
-use teamtools\Entities\Subscription;
-
-$data = [
-    'description' => 'This item will appear on next invoice',
-    'currency'    => 'usd',
-    'amount'      => 1800
-];
-
-$subscription = Subscription::getByID('56cc46f2bffebc5b078b4571');
-$subscription->addInvoiceItem($data);
 ```
 
 ## Invoices
