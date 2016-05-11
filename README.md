@@ -188,7 +188,7 @@ $team->delete();
 ```
 
 ### TeamTools SDK response formats
-Every interaction with TeamTools SDK will return resoponse, even delete operation returns deleted resource. 
+Every interaction with TeamTools SDK will return response, even delete operation returns deleted resource. 
 There are two types of responses: PHP object and raw JSON response as API returns it. Default format is 
 PHP object (Entity or ArrayIterator when collections are returned) and raw response can be received by:
 
@@ -222,6 +222,215 @@ Object          | Raw
 `getAttributes` | `getAttributesRaw`
                 |
 
+### Subscriptions Guide
+
+teamtools subscription platform has following elements Groups, Packages, Plans which are important to start subscribing your Customers. This Guide is overview how to start with creation of Groups, Packages and Plans, before subscribing your Customers on [teamtools.io](http://www.teamtools.io)
+For technical reference, check our [API Documentation](https://dash.readme.io/project/teamtools/v1.0/docs/getting-started).
+
+### Groups, Packages and Plans
+#### Step 1: Create Group
+To start, you'll need to create Group, using API or directly on teamtools dashboard. Group should help you merge Packages you want to associate together. Group of Packages has its purpose when you want to assign Customers only to the Packages which belong to the one specific group.
+Also, if you want to assign your Customers to default set of Packages (without providing specific PackageId), you will have possibility to set default Group, 
+- name - a user-friendly label for the Group that’ll be seen by you in your dashboard, and possibly by your customers.
+- default - should be set as true or false, depending if you want to set Group as default
+- defaultPackageId - each Group should contain at least one Package. If Group is having more than one Package, you should determine, which Package is getting defaultPackageId.
+
+Code example: 
+```
+use teamtools\Entities\Group;
+...
+
+$data = [
+    'name'    => 'Standard group',
+    'default' => true   //if ommited and this is first group in the system, group will become default
+];
+
+$group = new Group($data);
+var_dump($group->save());
+``` 
+
+# Provide example with default package
+
+```
+$data = [
+    'name'           => 'Standard group',
+    'defaultPackage' => 'xxxx',
+    'default'        => false
+];
+
+$group = new Group($data);
+var_dump($group->save());
+```
+
+#### Step 2: Create Packages
+Further, you'll need to create Package, using API or directly on teamtools dashboard. Package represents collection of Features you want to offer to your Customers and has Plans associated to it. Packages have following parameters:
+- name - a user-friendly label for the package that’ll be seen by you in your dashboard, and possibly by your customers.
+- description - additional description of Package for providing more information.
+- default - Indicates if Package is default for the group.
+- groupId - represents Package group. 
+- featureIds - represents Feature(s) you want to assign to Package.
+
+Code example:
+```
+use teamtools\Entities\Package;
+$data = [
+    'name'       => 'Basic package',
+    'groupId'    => 'xxx'
+];
+
+$package = new Package($data);
+var_dump($package->save());
+```
+
+Example creating package with features:
+```
+$data = [
+    'name'       => 'Pro package',
+    'featureIds' => [
+        '573305cdbffebc46088b4571',
+        '573305e5bffebc46088b4575'
+    ],
+    'groupId'    => '573301dbbffebc46088b4567'
+];
+
+$package = new Package($data);
+var_dump($package->save());
+```
+
+Upon creation of Package, you will get packageId from teamtools.
+Each Package requires a unique ID. You’ll provide this value in API requests to subscribe a customer to one of your Packages.
+
+> **Default Package**
+
+> In case there is only one Package created in the Group, this Package will get defaultPackageId.
+> If there are two or more Packages created in the Group, you'll need to decide which Package gets to be default.
+
+
+#### Step 3: Create Plan
+
+To add Pricing on the top of Package(s) created, you'll need to create Plan, using API or directly on teamtools dashboard. Plan contains pricing model, which describes how much and how often you want to charge your Customers. It also includes following parameters:
+- name - a user-friendly label for the Plan which will be inherited from Package name 
+- description - additional description of Plan for providing more information, which will be inherited from Package name 
+- trial - number of days available for trial, used in case Trial is offered by your service.
+- initialFee - amount, used in case you want to charge specific fee for service setup.
+- pricing - described below
+
+#### Step 4: Create Pricing Model
+Pricing model defines how price is calculated, it also includes definition of price amount and billing interval as important part in Plan creation. Pricing model includes following parameters interval, amount and type(depending of type selected, there are additional parameters required):
+- amount: price amount you want to charge for your service
+- interval: the billing period applied on the Plan; contains following parameters:
+  - type - can have one of the following values: 'day', 'week', 'month', 'year'
+  - amount - used to set more custom interval such as 25 days, or 5 months. Limits on amount are 365 days, 12 months and 1 year.
+- type can have one of the following values:
+  - free: service is free of charge; price amount is zero.
+  - flat: this type of model is used when defined price is fixed per billing interval, eg. $100/month, regardless of number of units (units most often refer to users).
+  - unit: this type of model is used when it is important to count total number of units, as price is defined per unit per billing interval, eg. $2/per user/per month.
+  - tier: this type of model is used when it is important to count total number of units but in respected condition or tier levels, and with price amount defined per unit or flat inside tier level.
+
+Example creating unit plan:
+```
+use teamtools\Entities\Plan;
+...
+
+$data = [
+    'name' => 'Enterprise',
+    'packageId' => '57330639bffebc46088b4579',
+    'trial' => '30',
+    'currency' => 'USD',
+    'pricing'   => [
+        'type' => 'unit',
+        'interval' => [
+            'type' => 'month',
+            'amount' => 2
+        ],
+        'unit' => 'enduser',
+        'amount' =>  200    //amount in cents
+    ]
+];
+
+$plan = new Plan($data);
+var_dump($plan->save());
+```
+
+Example creating tier plan: 
+```
+use teamtools\Entities\Plan;
+...
+
+$data = [
+    'name' => 'Enterprise',
+    'packageId' => '57330639bffebc46088b4579',
+    'trial' => '30',
+    'currency' => 'USD',
+    'pricing'   => [
+        'type' => 'tier',
+        'interval' => [
+            'type' => 'month',
+            'amount' => 2
+        ],
+        'unit' => 'enduser',
+        'levels' => [
+            [
+                'condition' => [
+                    'min' => 1,
+                    'max' => -1
+                ],
+                'expression' => [
+                    [
+                        'type' => 'unit',
+                        'unit' => 'enduser',
+                        'amount' => 120     //amount in cents
+
+                    ]
+                ]
+            ]
+        ]
+    ]
+];
+
+$plan = new Plan($data);
+var_dump($plan->save());
+```
+
+#### Examples for Tier model:
+
+> Example 1:
+> Tier 1: 1 - 10 users: $2/per user/per month
+> Tier 2: 11 - 25 users: $1/per user/ per month
+> Example 2:
+> Tier 1: 1 - 10 users: $20 flat / per month
+> Tier 2: 11 - 25 users: $24 flat / per month
+> 
+> **Examples: How to use Packages and Plans**
+> You may define just one Package or several ones, covering the diversity of service levels you want to offer to your Customers. > For example, if you have two groups of Customers–one using the basic features of your application and another using the pro features you would create a Basic Package and a Pro Package in teamtools.io. Naturally, you would like to apply different price for those two Packages. If for, Basic Package you want to charge you Customers $10 per month, and for Pro Package $2 per user per month, you would create Plan on Basic package with Pricing model - flat, $10, per month, and Plan on Pro package - per unit, > $2, per month.
+> But if you have special Customer using Pro package, whom you want to charge differently, eg:
+> - 1 - 10 users: $1/ per user/ per month
+> - 11 - 20 users: $2 /per user / per month
+> - 21 - 50 users: $ 35 flat/ per month
+> You would create new Custom Package, with Pricing model - tier, price defined per tier level, per month.
+
+
+### Start subscribing Customer to a Package
+
+There are two ways to create customer subscription: via customer create / update request and through dedicated endpoint.
+
+Create subscription using customer update request:
+```
+
+```
+
+> **Gateway Settings** 
+
+> In case you are using Gateway for processing payments (eg.Stripe), you do not have to create Customers or Plans on Gateway. teamtools will initiate creation of Customers and Plans on Gateway at the same time you send request or add them via dashboard > on teamtools.
+> You also need to set you Gateway API key under teamtools.io dashboard or via API - create gateway request
+In order to bill customers for subscriptions, you’ll need to collect their payment details using teamtools.js. or Stripe.js and > provide stripeToken as parameter of request. 
+Also, in order to enable teamtools to handle Gateway Events, all data received from Gateway will be forwarded to webhook set on > Gateway by teamtools.
+
+
+
+
+
+------------------------------------------------------------ billing v1 ---------------------------------------
 ### Billing package entity
 
 #### Billing package namespace
@@ -645,6 +854,15 @@ TeamToolsClient::initialize([
 
 TeamToolsClient::handleStripe();
 ```
+
+
+------------------------------------------------------- END billing v1 ----------------------------------------------
+
+
+
+
+
+
 
 #### Bulk insert and update
 
