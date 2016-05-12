@@ -465,7 +465,7 @@ $data = [
     'pricing'   => [
         'type' => 'flat',
         'interval' => [
-            'type' => 'month',
+            'type'   => 'month',
             'amount' => 2
         ],
         'amount' =>  1500
@@ -494,10 +494,9 @@ $data = [
                 ],
                 'expression' => [
                     [
-                        'type' => 'unit',
-                        'unit' => 'enduser',
+                        'type'   => 'unit',
+                        'unit'   => 'enduser',
                         'amount' => 120     //amount in cents
-
                     ]
                 ]
             ]
@@ -659,18 +658,6 @@ TeamToolsClient::initialize([
 TeamToolsClient::handleStripe();
 ```
 
-
-------------------------------------------------------- END billing v1 ----------------------------------------------
-
-
-
-
-
-
-
-
-
-
 #### Bulk insert and update
 
 Customers and Endusers support bulk operations like inserting and updating multiple records in single request. For this operation a structure named "data" should be provided, which contains array of entities to be persisted. If array element contains element "id", entity with that specific ID will be updated. Otherwise, entity will be inserted. All validations are still valid, like when working with single entity.
@@ -683,19 +670,19 @@ use teamtools\Entities\Customer;
 $customers = [
     'data' => [
         [
-            'id' => '5704f67cbffebc47078b4574',
-            'name' => 'My Customer XXY',
-            'email' => 'customerCHANGE@email.com',
-            'phone' => '+1234123412',
+            'id'      => '5704f67cbffebc47078b4574',
+            'name'    => 'My Customer XXY',
+            'email'   => 'customerCHANGE@email.com',
+            'phone'   => '+1234123412',
             'country' => 'USA',
-            'city' => 'Chicago',
+            'city'    => 'Chicago',
         ],
         [
-            'name' => 'My Customer YXY',
-            'email' => 'customer@email.com',
-            'phone' => '+1234123412',
+            'name'    => 'My Customer YXY',
+            'email'   => 'customer@email.com',
+            'phone'   => '+1234123412',
             'country' => 'USA',
-            'city' => 'Chicago'
+            'city'    => 'Chicago'
         ]
     ]
 ];
@@ -752,131 +739,171 @@ var_dump($webEvent);
 Customer name updated:
 ```
 {
-    "_id" : ObjectId("5729eb7bbffebc48088b456e"),
-    "timestamp" : ISODate("2016-05-04T12:30:51.000Z"),
-    "source" : "UI",
-    "memberId" : "5729c6ebbffebc47088b458a",
-    "url" : "http://webhookurl.com",
-    "action" : "updated",
-    "data" : {
-        "type" : "customer",
-        "value" : {
-            "id" : "5729e7c8bffebc47088b458b",
-            "name" : "ShiftPlanning 2",
-            "email" : "sp@shiftplanning.com",
-            "country" : "USA",
-            "phone" : "123",
-            "city" : "Belgrade",
-            "updated_at" : {
-                "date" : "2016-05-04 12:30:51.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "created_at" : {
-                "date" : "2016-05-04 12:15:04.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "tags" : [],
-            "notes" : []
+  "data": {
+    "id": "5729eb7bbffebc48088b456e",
+    "timestamp": "2016-05-04 12:30:51",
+    "source": "UI",
+    "memberId": "5729c6ebbffebc47088b458a",
+    "url": null,
+    "action": "updated",
+    "data": {
+      "type": "customer",
+      "value": {
+        "id": "5729e7c8bffebc47088b458b",
+        "name": "ShiftPlanning 2",
+        "email": "sp@shiftplanning.com",
+        "country": "USA",
+        "phone": "123",
+        "city": "Belgrade",
+        "joinDate": {
+          "date": "2016-05-01 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
         },
-        "old" : {
-            "id" : "5729e7c8bffebc47088b458b",
-            "name" : "ShiftPlanning",
-            "email" : "sp@shiftplanning.com",
-            "country" : "USA",
-            "phone" : "123",
-            "city" : "Belgrade",
-            "updated_at" : {
-                "date" : "2016-05-04 12:15:04.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "created_at" : {
-                "date" : "2016-05-04 12:15:04.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "tags" : [],
-            "notes" : []
-        }
+        "updated_at": {
+          "date": "2016-05-04 12:30:51.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "notes": []
+      },
+      "old": {
+        "id": "5729e7c8bffebc47088b458b",
+        "name": "ShiftPlanning",
+        "email": "sp@shiftplanning.com",
+        "country": "USA",
+        "phone": "123",
+        "city": "Belgrade",
+        "joinDate": {
+          "date": "2016-05-01 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "updated_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "notes": []
+      }
     },
-    "status" : "ok",
-    "updated_at" : ISODate("2016-05-04T12:30:51.888Z"),
-    "created_at" : ISODate("2016-05-04T12:30:51.888Z")
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-04 12:30:51.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-04 12:30:51.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
 }
 ```
 
 Group created:
 ```
 {
-    "_id" : ObjectId("57332e6dbffebc78088b4573"),
-    "timestamp" : ISODate("2016-05-11T13:06:53.000Z"),
-    "source" : "API",
-    "memberId" : null,
-    "url" : "http://webhookurl.com",
-    "action" : "created",
-    "data" : {
-        "type" : "group",
-        "value" : {
-            "id" : "57332e6dbffebc78088b4571",
-            "default" : true,
-            "updated_at" : {
-                "date" : "2016-05-11 13:06:53.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "created_at" : {
-                "date" : "2016-05-11 13:06:53.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "tags" : [],
-            "defaultPackageId" : null
+  "data": {
+    "id": "57332e6dbffebc78088b4573",
+    "timestamp": "2016-05-11 13:06:53",
+    "source": "API",
+    "memberId": null,
+    "url": null,
+    "action": "created",
+    "data": {
+      "type": "group",
+      "value": {
+        "id": "57332e6dbffebc78088b4571",
+        "default": true,
+        "updated_at": {
+          "date": "2016-05-11 13:06:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
         },
-        "old" : null
+        "created_at": {
+          "date": "2016-05-11 13:06:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "defaultPackageId": null
+      },
+      "old": null
     },
-    "status" : "ok",
-    "updated_at" : ISODate("2016-05-11T13:06:53.590Z"),
-    "created_at" : ISODate("2016-05-11T13:06:53.590Z")
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-11 13:06:53.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-11 13:06:53.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
 }
 ```
 
 Package deleted:
 ```
 {
-    "_id" : ObjectId("57334232bffebc77088b4574"),
-    "timestamp" : ISODate("2016-05-11T14:31:14.000Z"),
-    "source" : "API",
-    "memberId" : null,
-    "url" : "http://webhookurl.com",
-    "action" : "deleted",
-    "data" : {
-        "type" : "package",
-        "value" : {
-            "id" : "5733052dbffebc46088b456b",
-            "name" : "Basic package",
-            "default" : false,
-            "updated_at" : {
-                "date" : "2016-05-11 10:10:53.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "created_at" : {
-                "date" : "2016-05-11 10:10:53.000000",
-                "timezone_type" : NumberLong(3),
-                "timezone" : "UTC"
-            },
-            "groupId" : "573301dbbffebc46088b4567",
-            "deleted_at" : "2016-05-11 14:31:14",
-            "tags" : [],
-            "featureIds" : []
+  "data": {
+    "id": "57334232bffebc77088b4574",
+    "timestamp": "2016-05-11 14:31:14",
+    "source": "API",
+    "memberId": null,
+    "url": null,
+    "action": "deleted",
+    "data": {
+      "type": "package",
+      "value": {
+        "id": "5733052dbffebc46088b456b",
+        "name": "Basic package",
+        "default": false,
+        "updated_at": {
+          "date": "2016-05-11 10:10:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
         },
-        "old" : null
+        "created_at": {
+          "date": "2016-05-11 10:10:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "groupId": "573301dbbffebc46088b4567",
+        "deleted_at": "2016-05-11 14:31:14",
+        "tags": [],
+        "featureIds": []
+      },
+      "old": null
     },
-    "status" : "ok",
-    "updated_at" : ISODate("2016-05-11T14:31:14.336Z"),
-    "created_at" : ISODate("2016-05-11T14:31:14.336Z")
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-11 14:31:14.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-11 14:31:14.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
 }
 ```
 
