@@ -72,8 +72,8 @@ class TeamToolsClient
         ];
 
         if (isset($config['test']) && $config['test']) {
-            $this->authDomain   = self::TEST_AUTH_DOMAIN;
-            $this->apiDomain    = self::TEST_API_DOMAIN;
+            $this->authDomain = self::TEST_AUTH_DOMAIN;
+            $this->apiDomain  = self::TEST_API_DOMAIN;
         }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');
