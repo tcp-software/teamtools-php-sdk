@@ -10,6 +10,8 @@ class TeamToolsClient
 {
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
+    const TEST_AUTH_DOMAIN        = 'https://develop-auth.dev.teamtools.io/';
+    const TEST_API_DOMAIN         = 'https://develop-api.dev.teamtools.io/';
 
     protected $authDomain   = 'https://auth.teamtools.io/';
     protected $apiDomain    = 'https://api.teamtools.io/';
@@ -70,8 +72,8 @@ class TeamToolsClient
         ];
 
         if (isset($config['test']) && $config['test']) {
-            $this->authDomain   = 'https://develop-auth.dev.teamtools.io/';
-            $this->apiDomain    = 'https://develop-api.dev.teamtools.io/';
+            $this->authDomain = self::TEST_AUTH_DOMAIN;
+            $this->apiDomain  = self::TEST_API_DOMAIN;
         }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');

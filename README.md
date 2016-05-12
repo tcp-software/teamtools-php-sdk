@@ -188,7 +188,7 @@ $team->delete();
 ```
 
 ### TeamTools SDK response formats
-Every interaction with TeamTools SDK will return resoponse, even delete operation returns deleted resource. 
+Every interaction with TeamTools SDK will return response, even delete operation returns deleted resource. 
 There are two types of responses: PHP object and raw JSON response as API returns it. Default format is 
 PHP object (Entity or ArrayIterator when collections are returned) and raw response can be received by:
 
@@ -221,126 +221,6 @@ Object          | Raw
 `getAll`        | `getAllRaw`
 `getAttributes` | `getAttributesRaw`
                 |
-
-### Billing package entity
-
-#### Billing package namespace
-```sh
-use teamtools\Entities\Package;
-```
-
-#### Get billing package attributes
-
-```sh
-$attributes = Package::getAttributes();
-```
-
-#### Create billing package attributes
-
-
-
-```sh
-$data = [
-    'name'         => 'calculationBase',
-    'prettyName'   => 'Calculation Base',
-    'type'         => 'text',
-    'description'  => 'Base for calculation',
-    'required'     => true,
-    'editable'     => true,
-    'searchable'   => true,
-    'default'      => false,
-    'defaultValue' => ''
-];
-
-$attribute = new Attribute($data);
-Package::saveAttribute($attribute);
-```
-
-#### Update billing package attributes
-
-```sh
-$data = [
-    'id'           => '5655b89bbffebc40078b4595',
-    'name'         => 'Calculation Base',
-    'prettyName'   => 'Calculation Base',
-    'type'         => 'text',
-    'description'  => 'Base for calculation changed',
-    'required'     => true,
-    'editable'     => true,
-    'searchable'   => true,
-    'default'      => false,
-    'defaultValue' => ''
-];
-
-$attribute = new Attribute($data);
-Package::saveAttribute($attribute);
-```
-
-#### Delete billing package attribute
-
-```sh
-Package::deleteAttribute('5655bc9bbffebc40078b4598');
-```
-
-### Billing package entity
-
-#### Creating billing packages
-
-```sh
-$data = [
-    'name'        => 'perUser',
-    'description' => 'Billing per user',
-    'packageType' => 'custom',
-    'trial'       => '30',
-];
-
-$package = new Package($data);
-$package->save();
-
-```
-
-#### Create billing package with features
-```sh
-$data = [
-    'name'             => 'perUser',
-    'description'      => 'Billing per user',
-    'packageType'      => 'custom',
-    'trial'            => '30',
-    'calculationBase'  => 'asdf',
-    'calculationBase2' => 'asdf',
-    'feature_ids'      => [
-        '5655c5edbffebc40078b459c',
-        '5655c5f6bffebc40078b459e'
-    ]
-];
-
-$package = new Package($data);
-
-$package->save();
-```
-
-#### Retrieving billing packages
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-```
-
-#### Updating billing package
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-
-$package->description = 'New package description';
-$package->save();
-```
-
-#### Deleting billing package
-
-```sh
-$package = Package::getByID('5655b34abffebc3f078b458e');
-$package->delete();
-```
-
 ## Features
 
 #### Feature namespace
@@ -441,7 +321,6 @@ $feature = Feature::getByID('5655d765bffebc3f078b4595');
 $feature->delete();
 ```
 
-
 #### Relation examples
 
 ##### Update feature dependencies
@@ -458,44 +337,166 @@ $feature->dependency_ids = [];
 $feature->save();
 ```
 
-## Plans
-
-#### Plans namespace
-To work with plans, include the following namespace:
+### Groups, Packages and Plans
+#### Groups, Packages and Plans namespaces:
+To work with groups, packages or plans, include respective namespace:
 ```sh
+use teamtools\Entities\Group;
+use teamtools\Entities\Package;
 use teamtools\Entities\Plan;
 ```
 
-#### Get plan by ID
-```sh
-$plan = Plan::getByID('5673eff3bffebc4e078b4569');
+#### Step 1: Create Group
+Groups have following parameters:
+- name - a user-friendly label for the Group that’ll be seen by you in your dashboard, and possibly by your customers.
+- default - should be set as true or false, depending if you want to set Group as default
+- defaultPackageId - each Group should contain at least one Package. If Group is having more than one Package, you should determine, which Package is getting defaultPackageId.
+
+Code example: 
+```
+$data = [
+    'name'    => 'Standard group',
+    'default' => true   //if ommited and this is first group in the system, group will become default
+];
+
+$group = new Group($data);
+var_dump($group->save());
+``` 
+
+Example with default package and assign as default group:
+
+```
+$data = [
+    'name'           => 'Basic group',
+    'defaultPackage' => '5733052dbffebc46088b456b',
+    'default'        => true
+];
+
+$group = new Group($data);
+var_dump($group->save());
 ```
 
-#### Create plan
-```sh
+Retrieve packages by group ID:
+```
+$group = Group::getByID('573301dbbffebc46088b4567');
+var_dump($group->getPackages());
+```
+
+#### Step 2: Create Packages
+Packages have following parameters:
+- name - a user-friendly label for the package that’ll be seen by you in your dashboard, and possibly by your customers.
+- description - additional description of Package for providing more information.
+- default - Indicates if Package is default for the group.
+- groupId - represents Package group. 
+- featureIds - represents Feature(s) you want to assign to Package.
+
+Code example:
+```
 $data = [
-    'name'      => 'Enterprise2',
-    'packageId' => '5671392cbffebc46078b4567',
+    'name'    => 'Basic package',
+    'groupId' => '573301dbbffebc46088b4567',
+    'default' => 'true'     // assign this package as default in its group
+];
+
+$package = new Package($data);
+var_dump($package->save());
+```
+
+Example creating package with features:
+```
+$data = [
+    'name'       => 'Pro package',
+    'featureIds' => [
+        '573305cdbffebc46088b4571',
+        '573305e5bffebc46088b4575'
+    ],
+    'groupId'    => '573301dbbffebc46088b4567'
+];
+
+$package = new Package($data);
+var_dump($package->save());
+```
+
+Upon creation of Package, you will get packageId from teamtools.
+Each Package requires a unique ID. You’ll provide this value in API requests to subscribe a customer to one of your Packages.
+
+> **Default Package**
+
+> In case there is only one Package created in the Group, this Package will get defaultPackageId.
+> If there are two or more Packages created in the Group, you'll need to decide which Package gets to be default.
+
+
+#### Step 3: Create Plan
+
+Plan includes following parameters:
+- name - a user-friendly label for the Plan which will be inherited from Package name 
+- description - additional description of Plan for providing more information, which will be inherited from Package name 
+- trial - number of days available for trial, used in case Trial is offered by your service.
+- initialFee - amount, used in case you want to charge specific fee for service setup.
+- pricing - described below
+
+Example creating unit plan:
+```
+$data = [
+    'packageId' => '57330639bffebc46088b4579',
     'trial'     => '30',
+    'currency'  => 'USD',
     'pricing'   => [
-        'type'       => 'tier',
-        'interval'   => [
-            'type'   => 'month',
+        'type' => 'unit',
+        'interval' => [
+            'type' => 'month',
             'amount' => 2
         ],
         'unit'   => 'enduser',
+        'amount' =>  200    //amount in cents
+    ]
+];
+
+$plan = new Plan($data);
+var_dump($plan->save());
+```
+Example creating flat plan:
+```
+$data = [
+    'name'      => 'Enterprise',
+    'packageId' => '57330639bffebc46088b4579',
+    'trial' => '30',
+    'currency'  => 'USD',
+    'pricing'   => [
+        'type' => 'flat',
+        'interval' => [
+            'type'   => 'month',
+            'amount' => 2
+        ],
+        'amount' =>  1500
+    ]
+];
+```
+
+Example creating tier plan: 
+```
+$data = [
+    'packageId' => '57330639bffebc46088b4579',
+    'trial'     => '30',
+    'currency'  => 'USD',
+    'pricing'   => [
+        'type' => 'tier',
+        'interval' => [
+            'type' => 'month',
+            'amount' => 2
+        ],
+        'unit' => 'enduser',
         'levels' => [
             [
-                'condition'  => [
-                    'min'    => 1,
-                    'max'    => -1
+                'condition' => [
+                    'min' => 1,
+                    'max' => -1
                 ],
                 'expression' => [
                     [
                         'type'   => 'unit',
                         'unit'   => 'enduser',
-                        'amount' => 12
-
+                        'amount' => 120     //amount in cents
                     ]
                 ]
             ]
@@ -504,52 +505,63 @@ $data = [
 ];
 
 $plan = new Plan($data);
-$plan->save();
+var_dump($plan->save());
 ```
 
-#### Update plan
-
-Only `allowedCustomerIds` is allowed for update on plan:
-```sh
-$plan                        = Plan::getByID('5673eff3bffebc4e078b4569');
-$plan->allowedCustomerIds[]  = ['566fd788bffebc40078b4567', '56829644bffebc48078b4576'];
-
-$plan->save();
-```
-
-#### Delete plan
-
+Get plan by ID:
 ```sh
 $plan = Plan::getByID('5673eff3bffebc4e078b4569');
-$plan->delete();
 ```
 
-## Subscriptions
+#### Start subscribing Customer to a Package
 
-#### Subscribe customer to plan
+There are two ways to create customer subscription: via customer create / update request and through dedicated endpoint. 
 
-Customer can be subscribed to plan through package: if customer is contained in `allowedCustomerIds` in some plan, than customer will be subscribed to that plan. Otherwise, it gets subscription to default plan from passed package. If customer has payment gateway defined, request for subscription will be also sent to gateway. Return value: `subscription` object.
-
+Create subscription using customer update request (returns `customer` in response):
 ```
-use teamtools\Entities\Customer;
-use teamtools\Entities\Package;
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+$customer->groupId = 'default';
 
-...
-
-$customer = Customer::getByID('56c73ce5bffebc47078b4619');
-var_dump($customer->subscribe(['packageId' => '56c46c5bbffebcd4038b458a']));
+var_dump($customer->save());
 ```
 
-#### Unsubscribe customer from plan
+Create subscription using dedicated endpoint (default group). Returns `subscription` in response:
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
 
-By calling following SDK function customer will be unsubscribed from current plan. If subscription exists on payment gateway, it will also be cancelled.
+$subscriptionData = [
+    'groupId' => 'default'
+];
+
+var_dump($customer->subscribe($subscriptionData));
+```
+
+Create subscription using dedicated endpoint:
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+
+$subscriptionData = [
+    'groupId'     => '573301dbbffebc46088b4567',
+    'packageId'   => '5733052dbffebc46088b456b',
+    'manual'      => 'false',
+    'stripeToken' => 'xxxx'
+];
+
+var_dump($customer->subscribe($subscriptionData));
+```
+
+Retrieve customer's subscription
+```
+$customer = Customer::getByID('5730838fbffebc290b8b4591');
+var_dump($customer->getSubscription());
+```
+
+#### Unsubscribe customer from package
+
+By calling following SDK function customer will be unsubscribed from current package. If subscription exists on payment gateway, it will also be cancelled.
 Return value: `subscription` object.
 
 ```
-use teamtools\Entities\Customer;
-
-...
-
 $customer = Customer::getByID('56c73ce5bffebc47078b4619');
 var_dump($customer->unsubscribe());
 ```
@@ -658,19 +670,19 @@ use teamtools\Entities\Customer;
 $customers = [
     'data' => [
         [
-            'id' => '5704f67cbffebc47078b4574',
-            'name' => 'My Customer XXY',
-            'email' => 'customerCHANGE@email.com',
-            'phone' => '+1234123412',
+            'id'      => '5704f67cbffebc47078b4574',
+            'name'    => 'My Customer XXY',
+            'email'   => 'customerCHANGE@email.com',
+            'phone'   => '+1234123412',
             'country' => 'USA',
-            'city' => 'Chicago',
+            'city'    => 'Chicago',
         ],
         [
-            'name' => 'My Customer YXY',
-            'email' => 'customer@email.com',
-            'phone' => '+1234123412',
+            'name'    => 'My Customer YXY',
+            'email'   => 'customer@email.com',
+            'phone'   => '+1234123412',
             'country' => 'USA',
-            'city' => 'Chicago'
+            'city'    => 'Chicago'
         ]
     ]
 ];
@@ -715,3 +727,183 @@ $endusers = [
 
 var_dump(EndUser::saveAll($endusers, false));
 ```
+
+### Retrieve webhook event
+```
+$webEvent = WebEvent::getByID('57334232bffebc77088b4574');
+var_dump($webEvent);
+```
+
+### Webhook event format examples
+
+Customer name updated:
+```
+{
+  "data": {
+    "id": "5729eb7bbffebc48088b456e",
+    "timestamp": "2016-05-04 12:30:51",
+    "source": "UI",
+    "memberId": "5729c6ebbffebc47088b458a",
+    "url": null,
+    "action": "updated",
+    "data": {
+      "type": "customer",
+      "value": {
+        "id": "5729e7c8bffebc47088b458b",
+        "name": "ShiftPlanning 2",
+        "email": "sp@shiftplanning.com",
+        "country": "USA",
+        "phone": "123",
+        "city": "Belgrade",
+        "joinDate": {
+          "date": "2016-05-01 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "updated_at": {
+          "date": "2016-05-04 12:30:51.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "notes": []
+      },
+      "old": {
+        "id": "5729e7c8bffebc47088b458b",
+        "name": "ShiftPlanning",
+        "email": "sp@shiftplanning.com",
+        "country": "USA",
+        "phone": "123",
+        "city": "Belgrade",
+        "joinDate": {
+          "date": "2016-05-01 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "updated_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-04 12:15:04.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "notes": []
+      }
+    },
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-04 12:30:51.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-04 12:30:51.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
+}
+```
+
+Group created:
+```
+{
+  "data": {
+    "id": "57332e6dbffebc78088b4573",
+    "timestamp": "2016-05-11 13:06:53",
+    "source": "API",
+    "memberId": null,
+    "url": null,
+    "action": "created",
+    "data": {
+      "type": "group",
+      "value": {
+        "id": "57332e6dbffebc78088b4571",
+        "default": true,
+        "updated_at": {
+          "date": "2016-05-11 13:06:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-11 13:06:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "tags": [],
+        "defaultPackageId": null
+      },
+      "old": null
+    },
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-11 13:06:53.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-11 13:06:53.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
+}
+```
+
+Package deleted:
+```
+{
+  "data": {
+    "id": "57334232bffebc77088b4574",
+    "timestamp": "2016-05-11 14:31:14",
+    "source": "API",
+    "memberId": null,
+    "url": null,
+    "action": "deleted",
+    "data": {
+      "type": "package",
+      "value": {
+        "id": "5733052dbffebc46088b456b",
+        "name": "Basic package",
+        "default": false,
+        "updated_at": {
+          "date": "2016-05-11 10:10:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "created_at": {
+          "date": "2016-05-11 10:10:53.000000",
+          "timezone_type": 3,
+          "timezone": "UTC"
+        },
+        "groupId": "573301dbbffebc46088b4567",
+        "deleted_at": "2016-05-11 14:31:14",
+        "tags": [],
+        "featureIds": []
+      },
+      "old": null
+    },
+    "status": "failed",
+    "updated_at": {
+      "date": "2016-05-11 14:31:14.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    },
+    "created_at": {
+      "date": "2016-05-11 14:31:14.000000",
+      "timezone_type": 3,
+      "timezone": "UTC"
+    }
+  }
+}
+```
+
