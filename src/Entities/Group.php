@@ -7,6 +7,9 @@ use teamtools\Managers\GroupManager;
 class Group extends Entity
 {
     protected static $manager = GroupManager::class;
+    public static $relationMap = [
+        'packages' => Package::class
+    ];
 
     public function getPackages($raw = false)
     {

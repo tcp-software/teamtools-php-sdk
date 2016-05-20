@@ -8,6 +8,11 @@ use teamtools\Managers\CustomerManager;
 class Customer extends Entity
 {
     protected static $manager = CustomerManager::class;
+    public static $relationMap = [
+        'subscription' => Subscription::class,
+        'invoices'     => Invoice::class,
+        'users'        => EndUser::class,
+    ];
 
     public function save($raw = false)
     {
@@ -76,7 +81,7 @@ class Customer extends Entity
         return new \ArrayIterator($result);
     }
 
-    public function subscribe(array &$data, $raw = false)
+    public function subscribe(array $data, $raw = false)
     {
         $result  = [];
         $manager = static::$manager;
