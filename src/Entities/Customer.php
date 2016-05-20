@@ -98,12 +98,9 @@ class Customer extends Entity
         }
 
         $responseObject = json_decode($response);
+        $data           = get_object_vars($responseObject->data);
 
-        foreach ($responseObject->data as $item) {
-            $result[] = $item;
-        }
-
-        return new \ArrayIterator($result);
+        return new Subscription($data);
     }
 
     public function unsubscribe($raw = false)
