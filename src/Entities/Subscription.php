@@ -7,6 +7,12 @@ use teamtools\Managers\SubscriptionManager;
 class Subscription extends Entity
 {
     protected static $manager = SubscriptionManager::class;
+    public static $relationMap = [
+        'package' => Package::class,
+        'plan'    => Plan::class,
+        'coupon'  => Coupon::class,
+    ];
+
 
     public function addInvoiceItem(array $data, $raw = false)
     {

@@ -221,6 +221,60 @@ Object          | Raw
 `getAll`        | `getAllRaw`
 `getAttributes` | `getAttributesRaw`
                 |
+
+### Embedding related objects in response
+
+Normally, related objects will be represented with ID in response. For example, customer will contain subscription ID in response which can be used to fetch subscription object. It is possible to embed related object directly into response and save additional server request. 
+
+Example embedding subscription object into customer response:
+```
+$customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription');
+var_dump($customer);
+
+```
+
+Related data can be nested, and more than one relation can be included. Parameter format should be string with comma separated relations to embed.
+
+Examples for include parameter are:
+
+- embed single relation:
+  - include=events
+- embed multiple relations:
+  - include=events,customer
+- nesting data:
+  - include=events,customer.invoices
+
+Some example of related object manipulations:
+```
+// retrieve all features from package that customer is currently subscribed to:
+$customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription.package.features');
+var_dump($customer->subscription->package->features);
+
+// change property of related object
+$customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription.package');
+$package = $customer->subscription->package;
+$package->name = 'Pro plan changed name';
+
+var_dump($package->save());
+
+// include more than one relation and response examples
+$customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription.package,users');
+var_dump($customer);
+var_dump($customer->subscription);
+var_dump($customer->subscription->package);
+var_dump($customer->users);
+
+// search and include
+$customers = Customer::getAll([
+    'filter'  => 'country{ct}jamaica',
+    'include' => 'subscription.package'
+]);
+
+var_dump($customers);
+
+```
+
+
 ## Features
 
 #### Feature namespace

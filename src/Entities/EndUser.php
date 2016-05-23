@@ -8,6 +8,10 @@ use teamtools\Managers\EndUserManager;
 class EndUser extends Entity
 {
     protected static $manager = EndUserManager::class;
+    public static $relationMap = [
+        'customer' => Customer::class,
+        'events'   => Event::class
+    ];
 
     public function getEvents($raw = false)
     {
