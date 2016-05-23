@@ -105,24 +105,28 @@
         {
             switch ($name) {
                 case 'getByID':
-                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, false, $include);
                     break;
 
                 case 'getByIDRaw':
-                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, true);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, true, $include);
                     break;
 
                 case 'getByTag':
-                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, false, $include);
                     break;
 
                 case 'getByTagRaw':
-                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, true);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, true, $include);
                     break;
 
                 case 'getAll':
-                    $arguments['client'] = static::$client;
-                    $arguments['raw']    = false;
+                    $arguments['client']  = static::$client;
+                    $arguments['raw']     = false;
                     $result = call_user_func([static::$manager, 'getAll'], $arguments);
                     break;
 

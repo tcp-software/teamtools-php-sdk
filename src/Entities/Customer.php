@@ -8,6 +8,11 @@ use teamtools\Managers\CustomerManager;
 class Customer extends Entity
 {
     protected static $manager = CustomerManager::class;
+    public static $relationMap = [
+        'subscription' => Subscription::class,
+        'invoices'     => Invoice::class,
+        'users'        => EndUser::class,
+    ];
 
     public function save($raw = false)
     {
@@ -76,7 +81,7 @@ class Customer extends Entity
         return new \ArrayIterator($result);
     }
 
-    public function subscribe(array &$data, $raw = false)
+    public function subscribe(array $data, $raw = false)
     {
         $result  = [];
         $manager = static::$manager;
@@ -93,12 +98,9 @@ class Customer extends Entity
         }
 
         $responseObject = json_decode($response);
+        $data           = get_object_vars($responseObject->data);
 
-        foreach ($responseObject->data as $item) {
-            $result[] = $item;
-        }
-
-        return new \ArrayIterator($result);
+        return new Subscription($data);
     }
 
     public function unsubscribe($raw = false)
