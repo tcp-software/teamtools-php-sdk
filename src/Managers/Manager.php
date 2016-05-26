@@ -5,21 +5,23 @@ namespace teamtools\Managers;
 use GuzzleHttp\Exception\ClientException;
 use teamtools\Entities\Attribute;
 use teamtools\TeamToolsClient;
+use teamtools\Entities\Entity;
 
 class Manager
 {
     protected static $context;
     protected static $entityMap;
+    protected static $relationKeys;
 
     public static function getContext()
     {
         return static::$context;
     }
 
-    public static function getByID($id, TeamToolsClient $client, $raw = false)
+    public static function getByID($id, TeamToolsClient $client, $raw = false, $include = null)
     {
         try {
-            $response = $client->doRequest('get', [], static::$context . '/' . $id);
+            $response = $client->doRequest('get', [], static::$context . '/' . $id, 'api', $include);
         } catch (ClientException $ce) {
             $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
             return $response;
@@ -32,15 +34,19 @@ class Manager
         $responseObject = json_decode($response);
         $data           = get_object_vars($responseObject->data);
 
-        return new static::$entityMap($data);
+        $sdkObject = new static::$entityMap($data);
+        
+        static::parseIncludes($sdkObject, $include, $data);
+
+        return $sdkObject;
     }
 
-    public static function getByTag($tag, $client, $raw = false)
+    public static function getByTag($tag, $client, $raw = false, $include = false)
     {
         $result   = [];
 
         try {
-            $response = $client->doRequest('get', [], static::$context . '/tag/' . $tag);
+            $response = $client->doRequest('get', [], static::$context . '/tag/' . $tag, 'api', $include);
         } catch (ClientException $ce) {
             $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
             return $response;
@@ -53,8 +59,12 @@ class Manager
         $responseObject = json_decode($response);
 
         foreach ($responseObject->data as $entity) {
-            $data     = get_object_vars($entity);
-            $result[] = new static::$entityMap($data);
+            $data      = get_object_vars($entity);
+            $sdkObject = new static::$entityMap($data);
+            
+            static::parseIncludes($sdkObject, $include, $data);
+
+            $result[] = $sdkObject;
         }
 
         return new \ArrayIterator($result);
@@ -65,15 +75,17 @@ class Manager
         $result = [];
         $query  = [];
 
-        isset($args['keyword'])         && $query['keyword']        = $args['keyword'];
-        isset($args['filter'])          && $query['filter']         = $args['filter'];
-        isset($args['limit'])           && $query['limit']          = $args['limit'];
-        isset($args['offset'])          && $query['offset']         = $args['offset'];
-        isset($args['orderBy'])         && $query['orderBy']        = $args['orderBy'];
-        isset($args['orderDirection'])  && $query['orderDirection'] = $args['orderDirection'];
+        isset($args[0]['keyword'])         && $query['keyword']        = $args[0]['keyword'];
+        isset($args[0]['filter'])          && $query['filter']         = $args[0]['filter'];
+        isset($args[0]['limit'])           && $query['limit']          = $args[0]['limit'];
+        isset($args[0]['offset'])          && $query['offset']         = $args[0]['offset'];
+        isset($args[0]['orderBy'])         && $query['orderBy']        = $args[0]['orderBy'];
+        isset($args[0]['orderDirection'])  && $query['orderDirection'] = $args[0]['orderDirection'];
+
+        $include = isset($args[0]['include']) ? $args[0]['include'] : null;
 
         try {
-            $response = $args['client']->doRequest('get', $query, static::$context);
+            $response = $args['client']->doRequest('get', $query, static::$context, 'api', $include);
         } catch (ClientException $ce) {
             $response = $args['raw'] ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
             return $response;
@@ -87,7 +99,11 @@ class Manager
 
         foreach ($responseObject->data as $entity) {
             $data     = get_object_vars($entity);
-            $result[] = new static::$entityMap($data);
+            $sdkObject = new static::$entityMap($data);
+            
+            static::parseIncludes($sdkObject, $include, $data);
+
+            $result[] = $sdkObject;
         }
 
         return new \ArrayIterator($result);
@@ -153,5 +169,70 @@ class Manager
         $data           = get_object_vars($responseObject->data);
 
         return new Attribute($data);
+    }
+
+    public static function parseIncludes(Entity $entity, $include, $responseData)
+    {
+        // Include expressions are separated by comma: invoices,subscription.package.features.
+        // Here we attach inclusions for each expression
+        if ($entity::$relationMap && $include) {
+            $includes = explode(',', $include);
+
+            // Recursive inclusion of entities separated by dot
+            foreach ($includes as $includeKey) {
+                static::attachRelated($entity, $includeKey, $responseData);
+            }
+        }
+    }
+
+    public static function attachRelated(Entity $entity, $include, $responseData)
+    {
+        // Explode into 2 parts: entity key for inclusion and rest of the expression
+        $includes = explode('.', $include, 2);
+
+        $inclusionEntityKey = $includes[0];
+        $restOfExpression   = isset($includes[1]) ? $includes[1] : null;
+
+        $class = $entity::$relationMap[$inclusionEntityKey];
+        
+        if (!$responseData[$inclusionEntityKey]) {
+            return;
+        }
+
+        $rawData = $responseData[$inclusionEntityKey]->data;
+
+        if (is_array($rawData)) {
+            $relatedObject = [];
+
+            foreach ($rawData as $key => $value) {
+                $tmpObject = new $class(get_object_vars($value));
+                $relatedObject[] = $tmpObject;
+
+
+                if ($restOfExpression) {
+                    die(var_dump($value));
+                    static::attachRelated(
+                        $tmpObject, 
+                        $restOfExpression, 
+                        get_object_vars($value)
+                    );
+                }
+            }
+        } else {
+            $relatedObject = new $class(get_object_vars($rawData));
+        }
+
+        $entity->$inclusionEntityKey = $relatedObject;
+
+        if ($restOfExpression) {
+            if (!is_array($relatedObject)) {
+                static::attachRelated(
+                    $relatedObject, 
+                    $restOfExpression, 
+                    get_object_vars($responseData[$inclusionEntityKey]->data)
+                );
+            }
+            
+        }
     }
 }

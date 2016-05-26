@@ -91,9 +91,13 @@ class TeamToolsClient
         return $this->accessObject->access_token;
     }
 
-    public function doRequest($method, $data, $uri, $resource = 'api', $async = false)
+    public function doRequest($method, $data, $uri, $resource = 'api', $include = [])
     {
         $requestDataType = $method == 'get' ? 'query' : 'json';
+
+        if ($include) {
+            $data['include'] = $include;
+        }
 
         if ($resource == 'api') {
             $domain = $this->apiDomain;
@@ -102,7 +106,7 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        if ($async) {
+        /*if ($async) {
             $method .= 'Async';
             $promise = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
@@ -113,7 +117,10 @@ class TeamToolsClient
             $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
             return $response->getBody();
-        }
+        }*/
 
+        $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+
+        return $response->getBody();
     }
 }
