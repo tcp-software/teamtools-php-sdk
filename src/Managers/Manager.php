@@ -195,7 +195,9 @@ class Manager
 
         $class = $entity::$relationMap[$inclusionEntityKey];
         
-        //var_dump($responseData[$inclusionEntityKey]->data);
+        if (!$responseData[$inclusionEntityKey]) {
+            return;
+        }
 
         $rawData = $responseData[$inclusionEntityKey]->data;
 
@@ -203,7 +205,18 @@ class Manager
             $relatedObject = [];
 
             foreach ($rawData as $key => $value) {
-                $relatedObject[] = new $class(get_object_vars($value));
+                $tmpObject = new $class(get_object_vars($value));
+                $relatedObject[] = $tmpObject;
+
+
+                if ($restOfExpression) {
+                    die(var_dump($value));
+                    static::attachRelated(
+                        $tmpObject, 
+                        $restOfExpression, 
+                        get_object_vars($value)
+                    );
+                }
             }
         } else {
             $relatedObject = new $class(get_object_vars($rawData));
@@ -212,11 +225,14 @@ class Manager
         $entity->$inclusionEntityKey = $relatedObject;
 
         if ($restOfExpression) {
-            static::attachRelated(
-                $relatedObject, 
-                $restOfExpression, 
-                get_object_vars($responseData[$inclusionEntityKey]->data)
-            );
+            if (!is_array($relatedObject)) {
+                static::attachRelated(
+                    $relatedObject, 
+                    $restOfExpression, 
+                    get_object_vars($responseData[$inclusionEntityKey]->data)
+                );
+            }
+            
         }
     }
 }
