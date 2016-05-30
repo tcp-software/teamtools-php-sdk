@@ -195,7 +195,7 @@ class Manager
 
         $class = $entity::$relationMap[$inclusionEntityKey];
         
-        if (!$responseData[$inclusionEntityKey]) {
+        if (!isset($responseData[$inclusionEntityKey])) {
             return;
         }
 
