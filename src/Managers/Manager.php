@@ -210,7 +210,6 @@ class Manager
 
 
                 if ($restOfExpression) {
-                    die(var_dump($value));
                     static::attachRelated(
                         $tmpObject, 
                         $restOfExpression, 
