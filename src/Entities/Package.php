@@ -6,10 +6,10 @@ use teamtools\Managers\PackageManager;
 
 class Package extends Entity
 {
-    protected static $manager = PackageManager::class;
+    protected static $manager = 'teamtools\Managers\PackageManager';
     public static $relationMap = [
-        'features' => Feature::class,
-        'plan'     => Plan::class,
-        'group'    => Group::class,
+        'features' => 'teamtools\Entities\Feature',
+        'plan'     => 'teamtools\Entities\Plan',
+        'group'    => 'teamtools\Entities\Group',
     ];
 }

@@ -6,10 +6,10 @@ use teamtools\Managers\InvoiceManager;
 
 class Invoice extends Entity
 {
-    protected static $manager = InvoiceManager::class;
+    protected static $manager = 'teamtools\Managers\InvoiceManager';
     public static $relationMap = [
-        'payments' => Payment::class,
-        'refunds'  => Refund::class
+        'payments' => 'teamtools\Entities\Payment',
+        'refunds'  => 'teamtools\Entities\Refund'
     ];
 
     public function settle($raw = false)
