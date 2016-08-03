@@ -7,5 +7,5 @@ use teamtools\Entities\Payment;
 class PaymentManager extends Manager
 {
     protected static $context   = 'payments';
-    protected static $entityMap = Payment::class;
+    protected static $entityMap = 'teamtools\Entities\Payment';
 }

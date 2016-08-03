@@ -7,5 +7,5 @@ use teamtools\Entities\Plan;
 class PlanManager extends Manager
 {
     protected static $context   = 'plans';
-    protected static $entityMap = Plan::class;
+    protected static $entityMap = 'teamtools\Entities\Plan';
 }

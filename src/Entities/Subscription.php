@@ -6,11 +6,11 @@ use teamtools\Managers\SubscriptionManager;
 
 class Subscription extends Entity
 {
-    protected static $manager = SubscriptionManager::class;
+    protected static $manager = 'teamtools\Managers\SubscriptionManager';
     public static $relationMap = [
-        'package' => Package::class,
-        'plan'    => Plan::class,
-        'coupon'  => Coupon::class,
+        'package' => 'teamtools\Entities\Package',
+        'plan'    => 'teamtools\Entities\Plan',
+        'coupon'  => 'teamtools\Entities\Coupon',
     ];
 
 

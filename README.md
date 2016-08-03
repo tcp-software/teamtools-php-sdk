@@ -112,6 +112,80 @@ ie. record is marked as deleted and not physically removed from database.
 Team::deleteAttribute('56571718095747cc4b9215f4')
 ```
 
+#### Create customer
+
+```sh
+$data = [
+    'name'    => 'Awesome customer',
+    'email'   => 'customer@awesome.com',
+    'phone'   => '+1234567890',
+    'city'    => 'Berlin',
+    'country' => 'Germany',
+
+];
+
+$customer = new Customer($data);
+var_dump($customer->save(true));
+```
+
+If `id` is provided, update of existing customer will be performed. A simpler way to update entity is shown in next section (Update customer).
+```sh
+$data = [
+    'id'   => '5788a125bffebc57118b458c',
+    'name' => 'New awesome customer'
+];
+
+$customer = new Customer($data);
+$customer->save();
+```
+
+#### Update customer
+Updating entity flow is: instantiate object from database, set its attributes to desired value and save back to database. Entity can be retrieved by `id`, or `tag` and search in which case a collection of objects will be returned. Ways of retrieving entities are described in next section (Get customers).
+
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+$customer->name = 'New Customer Name';
+
+var_dump($customer->save());
+```
+
+#### Get customer
+Single team object can be retrived by its `id`.
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+```
+
+It's also possible to retrieve entities by tag, in which case a collection of entities will be returned. 
+```sh
+$team = Customer::getByTag('new');
+```
+
+Finally, entities can be searched by keyword using static method `getAll` which is provided in all entities.
+Also returns collection of entities.
+```sh
+// all customers
+$customers = Customer::getAll();
+
+foreach ($customers as $customer) {
+    var_dump($customer->name);
+}
+
+// search customers for 'awesome' in searchable attributes
+$customers = Customer::getAll(['keyword' => 'awesome']);
+
+foreach ($customers as $customer) {
+    var_dump($customer->name);
+}
+```
+
+#### Delete customer
+Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+
+$customer->delete();
+```
+
 #### Create team
 Team creation is acomplished by instantiating `Team` object and calling its `save` method. `Team` constructor expects array of properties,
 which should include all attributes that are defined on `Team` (this includes default and all custom attributes that may be defined). 
