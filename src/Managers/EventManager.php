@@ -7,5 +7,5 @@ use teamtools\Entities\Event;
 class EventManager extends Manager
 {
     protected static $context   = 'events';
-    protected static $entityMap = Event::class;
+    protected static $entityMap = 'teamtools\Entities\Event';
 }

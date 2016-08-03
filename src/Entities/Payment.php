@@ -6,5 +6,5 @@ use teamtools\Managers\PaymentManager;
 
 class Payment extends Entity
 {
-    protected static $manager = PaymentManager::class;
+    protected static $manager = 'teamtools\Managers\PaymentManager';
 }

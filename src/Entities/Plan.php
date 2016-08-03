@@ -6,5 +6,5 @@ use teamtools\Managers\PlanManager;
 
 class Plan extends Entity
 {
-    protected static $manager = PlanManager::class;
+    protected static $manager = 'teamtools\Managers\PlanManager';
 }
