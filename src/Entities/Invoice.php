@@ -3,6 +3,7 @@
 namespace teamtools\Entities;
 
 use teamtools\Managers\InvoiceManager;
+use GuzzleHttp\Exception\ClientException;
 
 class Invoice extends Entity
 {
@@ -45,8 +46,7 @@ class Invoice extends Entity
         try {
             $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/payment');
         } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
+            die((string) $ce->getResponse()->getBody());
         }
 
         if ($raw) {
