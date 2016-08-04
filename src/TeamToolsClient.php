@@ -13,8 +13,8 @@ class TeamToolsClient
     const TEST_AUTH_DOMAIN        = 'https://develop-auth.dev.teamtools.io/';
     const TEST_API_DOMAIN         = 'https://develop-api.dev.teamtools.io/';
 
-    protected $authDomain   = 'https://auth.teamtools.io/';
-    protected $apiDomain    = 'https://api.teamtools.io/';
+    protected $authDomain   = 'http://auth.teamtools.local/';
+    protected $apiDomain    = 'http://api.teamtools.local/';
     protected $guzzleClient;
     protected $accessObject;
     protected static $instance;
