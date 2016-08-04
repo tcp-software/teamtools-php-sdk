@@ -194,6 +194,8 @@ class Manager
         $restOfExpression   = isset($includes[1]) ? $includes[1] : null;
 
         $class = $entity::$relationMap[$inclusionEntityKey];
+
+        unset($entity->$inclusionEntityKey);
         
         if (!isset($responseData[$inclusionEntityKey])) {
             return;

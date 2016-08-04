@@ -33,6 +33,11 @@
             }
         }
 
+        public function __unset($name)
+        {
+            unset($this->attributes[$name]);
+        }
+
         public function save($raw = false)
         {
             $manager    = static::$manager;
