@@ -49,6 +49,110 @@ If access token is needed for making additional requests to TeamTools API, it ca
 $accessToken = TeamToolsClient::getInstance()->getAccessToken();
 ```
 
+### Customer entity
+
+#### Team namespace
+
+To work with teams, include the following namespace:
+```sh
+use teamtools\Entities\Customer;
+```
+
+#### Create customer
+
+```sh
+$data = [
+    'name'    => 'Awesome customer',
+    'email'   => 'customer@awesome.com',
+    'phone'   => '+1234567890',
+    'city'    => 'Berlin',
+    'country' => 'Germany',
+
+];
+
+$customer = new Customer($data);
+var_dump($customer->save(true));
+```
+
+#### Update customer
+Updating entity flow is: instantiate object from database, set its attributes to desired value and save back to database. Entity can be retrieved by `id`, or `tag` and search in which case a collection of objects will be returned. Ways of retrieving entities are described in next section (Get customers).
+
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+$customer->name = 'New Customer Name';
+
+var_dump($customer->save());
+```
+
+If `id` is provided, update of existing customer will be performed. A simpler way to update entity is shown in next section (Update customer).
+```sh
+$data = [
+    'id'   => '5788a125bffebc57118b458c',
+    'name' => 'New awesome customer'
+];
+
+$customer = new Customer($data);
+$customer->save();
+
+#### Get customer
+Single team object can be retrived by its `id`.
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+```
+
+It's also possible to retrieve entities by tag, in which case a collection of entities will be returned. 
+```sh
+$team = Customer::getByTag('new');
+```
+
+Finally, entities can be searched by keyword using static method `getAll` which is provided in all entities.
+Also returns collection of entities.
+```sh
+// all customers
+$customers = Customer::getAll();
+
+foreach ($customers as $customer) {
+    var_dump($customer->name);
+}
+
+// search customers for 'awesome' in searchable attributes
+$customers = Customer::getAll(['keyword' => 'awesome']);
+
+foreach ($customers as $customer) {
+    var_dump($customer->name);
+}
+```
+
+#### Delete customer
+Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
+```sh
+$customer = Customer::getByID('5788a125bffebc57118b458c');
+
+$customer->delete();
+```
+
+#### Migrate endusers to another customer
+Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
+```sh
+$customer = Customer::getByID('57e3a147bffebc75388b4571');
+$newCustomerId = '57ecf1f6bffebcc5098b4585';
+
+//migrate specific endusers
+$ids = ['57ecf1b0bffebcc3098b4582', '57ecf1b0bffebcc3098b4587'];
+
+var_dump($customer->migrateEndusers($newCustomerId, $ids));
+```
+
+```sh
+$customer = Customer::getByID('57e3a147bffebc75388b4571');
+$newCustomerId = '57ecf1f6bffebcc5098b4585';
+
+//migrate all endusers
+
+var_dump($customer->migrateEndusers($newCustomerId));
+```
+
+
 
 ### Team entity
 
@@ -110,80 +214,6 @@ ie. record is marked as deleted and not physically removed from database.
 
 ```sh
 Team::deleteAttribute('56571718095747cc4b9215f4')
-```
-
-#### Create customer
-
-```sh
-$data = [
-    'name'    => 'Awesome customer',
-    'email'   => 'customer@awesome.com',
-    'phone'   => '+1234567890',
-    'city'    => 'Berlin',
-    'country' => 'Germany',
-
-];
-
-$customer = new Customer($data);
-var_dump($customer->save(true));
-```
-
-If `id` is provided, update of existing customer will be performed. A simpler way to update entity is shown in next section (Update customer).
-```sh
-$data = [
-    'id'   => '5788a125bffebc57118b458c',
-    'name' => 'New awesome customer'
-];
-
-$customer = new Customer($data);
-$customer->save();
-```
-
-#### Update customer
-Updating entity flow is: instantiate object from database, set its attributes to desired value and save back to database. Entity can be retrieved by `id`, or `tag` and search in which case a collection of objects will be returned. Ways of retrieving entities are described in next section (Get customers).
-
-```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
-$customer->name = 'New Customer Name';
-
-var_dump($customer->save());
-```
-
-#### Get customer
-Single team object can be retrived by its `id`.
-```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
-```
-
-It's also possible to retrieve entities by tag, in which case a collection of entities will be returned. 
-```sh
-$team = Customer::getByTag('new');
-```
-
-Finally, entities can be searched by keyword using static method `getAll` which is provided in all entities.
-Also returns collection of entities.
-```sh
-// all customers
-$customers = Customer::getAll();
-
-foreach ($customers as $customer) {
-    var_dump($customer->name);
-}
-
-// search customers for 'awesome' in searchable attributes
-$customers = Customer::getAll(['keyword' => 'awesome']);
-
-foreach ($customers as $customer) {
-    var_dump($customer->name);
-}
-```
-
-#### Delete customer
-Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
-```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
-
-$customer->delete();
 ```
 
 #### Create team
@@ -796,22 +826,20 @@ Customers example:
 use teamtools\Entities\Customer;
 
 $customers = [
-    'data' => [
-        [
-            'id'      => '5704f67cbffebc47078b4574',
-            'name'    => 'My Customer XXY',
-            'email'   => 'customerCHANGE@email.com',
-            'phone'   => '+1234123412',
-            'country' => 'USA',
-            'city'    => 'Chicago',
-        ],
-        [
-            'name'    => 'My Customer YXY',
-            'email'   => 'customer@email.com',
-            'phone'   => '+1234123412',
-            'country' => 'USA',
-            'city'    => 'Chicago'
-        ]
+    [
+        'id'      => '5704f67cbffebc47078b4574',
+        'name'    => 'My Customer XXY',
+        'email'   => 'customerCHANGE@email.com',
+        'phone'   => '+1234123412',
+        'country' => 'USA',
+        'city'    => 'Chicago',
+    ],
+    [
+        'name'    => 'My Customer YXY',
+        'email'   => 'customer@email.com',
+        'phone'   => '+1234123412',
+        'country' => 'USA',
+        'city'    => 'Chicago'
     ]
 ];
 
@@ -824,32 +852,30 @@ Endusers example:
 use teamtools\Entities\EndUser;
 
 $endusers = [
-    'data' => [
-        [
-            'firstName' => 'Mary',
-            'lastName'  => 'Jones',
-            'email'     => 'customerCHANGE@email.com',
-            'phone'     => '+1234123412',
-            'country'   => 'USA',
-            'city'      => 'Chicago'
-        ],
-        [
-            'firstName' => 'Peter',
-            'lastName'  => 'Johnson',
-            'email'     => 'customer@email.com',
-            'phone'     => '+1234123412',
-            'country'   => 'USA',
-            'city'      => 'Chicago'
-        ],
-        [
-            'id'        => '57050433bffebc46078b457f',
-            'firstName' => 'John',
-            'lastName'  => 'Smith',
-            'email'     => 'customer@email.com',
-            'phone'     => '+1234123412',
-            'country'   => 'USA',
-            'city'      => 'Chicago'
-        ]
+    [
+        'firstName' => 'Mary',
+        'lastName'  => 'Jones',
+        'email'     => 'customerCHANGE@email.com',
+        'phone'     => '+1234123412',
+        'country'   => 'USA',
+        'city'      => 'Chicago'
+    ],
+    [
+        'firstName' => 'Peter',
+        'lastName'  => 'Johnson',
+        'email'     => 'customer@email.com',
+        'phone'     => '+1234123412',
+        'country'   => 'USA',
+        'city'      => 'Chicago'
+    ],
+    [
+        'id'        => '57050433bffebc46078b457f',
+        'firstName' => 'John',
+        'lastName'  => 'Smith',
+        'email'     => 'customer@email.com',
+        'phone'     => '+1234123412',
+        'country'   => 'USA',
+        'city'      => 'Chicago'
     ]
 ];
 
