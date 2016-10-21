@@ -199,4 +199,34 @@ class Customer extends Entity
 
         return new \ArrayIterator($result);
     }
+
+    public function migrateEndusers($newCustomerId, array $ids = [], $raw = false)
+    {
+        $manager = static::$manager;
+        $result   = [];
+
+        try {
+            $response = static::$client->doRequest(
+                'put', 
+                ['enduserIds' => $ids, 'newCustomerId' => $newCustomerId], 
+                $manager::getContext() . '/' . $this->id . '/endusers'
+            );
+        } catch (ClientException $ce) {
+            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
+            return $response;
+        }
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $entity) {
+            $data     = get_object_vars($entity);
+            $result[] = new static($data);
+        }
+
+        return new \ArrayIterator($result);
+    }
 }
