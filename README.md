@@ -1,4 +1,5 @@
 # Teamtools PHP SDK
+- List of all [SDK methods](functions.md)
 
 #### Installation
 
@@ -51,11 +52,12 @@ $accessToken = TeamToolsClient::getInstance()->getAccessToken();
 
 ### Customer entity
 
-#### Team namespace
+#### Customer namespace
 
-To work with teams, include the following namespace:
+To work with customers, include the following namespace:
 ```sh
 use teamtools\Entities\Customer;
+use teamtools\Exceptions\TTException;   // this will be needed for error-handling
 ```
 
 #### Create customer
@@ -66,43 +68,51 @@ $data = [
     'email'   => 'customer@awesome.com',
     'phone'   => '+1234567890',
     'city'    => 'Berlin',
-    'country' => 'Germany',
-
+    'country' => 'Germany'
 ];
 
 $customer = new Customer($data);
-var_dump($customer->save(true));
+
+try {
+    var_dump($customer->save(true));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Update customer
 Updating entity flow is: instantiate object from database, set its attributes to desired value and save back to database. Entity can be retrieved by `id`, or `tag` and search in which case a collection of objects will be returned. Ways of retrieving entities are described in next section (Get customers).
 
 ```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
+$customer = Customer::getByID('580a0ffcbffebc8b0e8b456a');
 $customer->name = 'New Customer Name';
 
-var_dump($customer->save());
+try {
+    var_dump($customer->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
-
-If `id` is provided, update of existing customer will be performed. A simpler way to update entity is shown in next section (Update customer).
-```sh
-$data = [
-    'id'   => '5788a125bffebc57118b458c',
-    'name' => 'New awesome customer'
-];
-
-$customer = new Customer($data);
-$customer->save();
 
 #### Get customer
 Single team object can be retrived by its `id`.
 ```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
+try {
+    $customer = Customer::getByID('580a0ffcbffebc8b0e8b456a');
+    var_dump($customer);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 It's also possible to retrieve entities by tag, in which case a collection of entities will be returned. 
 ```sh
-$team = Customer::getByTag('new');
+try {
+    $customers = $customer = Customer::getByTag('new');
+    var_dump($customers);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Finally, entities can be searched by keyword using static method `getAll` which is provided in all entities.
@@ -126,46 +136,41 @@ foreach ($customers as $customer) {
 #### Delete customer
 Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
 ```sh
-$customer = Customer::getByID('5788a125bffebc57118b458c');
-
-$customer->delete();
+try {
+    $customer = Customer::getByID('580a0ffcbffebc8b0e8b456aff');
+    $customer->delete();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Migrate endusers to another customer
 Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
 ```sh
-$customer = Customer::getByID('57e3a147bffebc75388b4571');
-$newCustomerId = '57ecf1f6bffebcc5098b4585';
+try {
+    $customer = Customer::getByID('57e3a147bffebc75388b4571');
+    $newCustomerId = '57ecf1f6bffebcc5098b4585';
 
-//migrate specific endusers
-$ids = ['57ecf1b0bffebcc3098b4582', '57ecf1b0bffebcc3098b4587'];
+    //migrate specific endusers
+    $ids = ['57ecf1b0bffebcc3098b4582', '57ecf1b0bffebcc3098b4587'];
 
-var_dump($customer->migrateEndusers($newCustomerId, $ids));
+    var_dump($customer->migrateEndusers($newCustomerId, $ids));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ```sh
-$customer = Customer::getByID('57e3a147bffebc75388b4571');
-$newCustomerId = '57ecf1f6bffebcc5098b4585';
+try {
+    $customer = Customer::getByID('57e3a147bffebc75388b4571');
+    $newCustomerId = '57ecf1f6bffebcc5098b4585';
 
-//migrate all endusers
+    //migrate all endusers
 
-var_dump($customer->migrateEndusers($newCustomerId));
-```
-
-
-
-### Team entity
-
-#### Team namespace
-
-To work with teams, include the following namespace:
-```sh
-use teamtools\Entities\Team;
-```
-
-Additionally, when working with team attributes, `Attribute` namespace must be included:
-```sh
-use teamtools\Entities\Attribute;
+    var_dump($customer->migrateEndusers($newCustomerId));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ### Attributes
@@ -173,21 +178,21 @@ use teamtools\Entities\Attribute;
 Attributes are properties that can be defined and attached to entity. There is a set of predefined attributes 
 for each entity and arbitrary number of additional user-defined attributes may be created.
 
-#### Get team attributes
+#### Get customer attributes
 
 Retrieve a list of attributes for an entity. Contains default and custom attributes, as well as description
 of relationships with other entities.
 
 ```sh
-Team::getAttributes();
+Customer::getAttributes();
 ```
 
-#### Create or update team attribute
+#### Create or update customer attribute
 
 Custom attributes can be defined by instantiating `Attribute` object with corresponding properties and calling
 `saveAttribute` method on corresponding entity, as shown below. New custom attribute `department` will be created and
-attached to `Team`. This attribute will be included in validations when working with `Team` entity. For example:
-after creating this attribute, it won't be possible to create `Team` entity if `department` is not provided, since
+attached to `Customer`. This attribute will be included in validations when working with `Customer` entity. For example:
+after creating this attribute, it won't be possible to create `Customer` entity if `department` is not provided, since
 `department` is required custom attribute (`'required' => true`).
 
 ```sh
@@ -195,7 +200,7 @@ $data = [
     'name'         => 'department',
     'prettyName'   => 'Department',
     'type'         => 'text',
-    'description'  => "Team's department",
+    'description'  => "Customer's department",
     'required'     => true,
     'editable'     => true,
     'searchable'   => true,
@@ -204,91 +209,25 @@ $data = [
 ];
 
 $attribute = new Attribute($data);
-Team::saveAttribute($attribute);
+
+try {
+    Customer::saveAttribute($attribute);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
-#### Delete team attribute
+#### Delete customer attribute
 
 Attribute can be deleted by supplying its `id` to static method `deleteAttribute` of corresponding entity. Attributes are soft-deleted, 
 ie. record is marked as deleted and not physically removed from database.
 
 ```sh
-Team::deleteAttribute('56571718095747cc4b9215f4')
-```
-
-#### Create team
-Team creation is acomplished by instantiating `Team` object and calling its `save` method. `Team` constructor expects array of properties,
-which should include all attributes that are defined on `Team` (this includes default and all custom attributes that may be defined). 
-Attributes will be validated and appropriate response returned, which also may contain error message if arguments are missing or
-supplied in wrong format.
-
-```sh
-$data = [
-    'name' => 'Sales team'
-];
-
-$team = new Team($data);
-$team->save();
-```
-
-If `id` is provided, update of existing team will be performed. A simpler way to update entity is shown in next section (Update team).
-```sh
-$data = [
-    'id'   => '565719f3095747906a9215f5',
-    'name' => 'New sales team'
-];
-
-$team = new Team($data);
-$team->save();
-```
-
-#### Update team
-Updating entity flow is: instantiate object from database, set its attributes to desired value and save back to database. Entity can be 
-retrieved by `id`, or `tag` and search in which case a collection of objects will be returned. Ways of retrieving entities
-are described in next section (Get teams).
-
-```sh
-$team       = Team::getByID('565719f3095747906a9215f5');
-$team->name = 'Aftersales team';
-
-$team->save();
-```
-
-#### Get team
-Single team object can be retrived by its `id`.
-```sh
-$team = Team::getByID('565719f3095747906a9215f5');
-```
-
-It's also possible to retrieve entities by tag, in which case a collection of entities will be returned. 
-```sh
-$team = Team::getByTag('new');
-```
-
-Finally, entities can be searched by keyword using static method `getAll` which is provided in all entities.
-Also returns collection of entities.
-```sh
-// all teams
-$teams = Team::getAll();
-
-foreach ($teams as $team) {
-    var_dump($team->name);
+try {
+    Team::deleteAttribute('56571718095747cc4b9215f4');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
 }
-
-// search teams for sales in searchable attributes
-$teams = Team::getAll(['keyword' => 'sales']);
-
-foreach ($teams as $team) {
-    var_dump($team->name);
-}
-```
-
-#### Delete team
-Deleting team is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
-```sh
-$team = Team::getByID('565719f3095747906a9215f5');
-
-$team->delete();
 ```
 
 ### TeamTools SDK response formats
@@ -299,17 +238,25 @@ PHP object (Entity or ArrayIterator when collections are returned) and raw respo
 * supplying `true` to instance methods
   * Update team and return raw response
     ```sh
-    $team       = Team::getByID('56582c53095747b64b9215f7');
-    $team->name = 'SDK awesome team';
+    try {
+        $team       = Team::getByID('56582c53095747b64b9215f7');
+        $team->name = 'SDK awesome team';
 
-    $response   = $team->save(true);
+        $response   = $team->save(true);
+    } catch (TTException $ex) {
+        echo $ex->getMessage();
+    }
     ```
   * Update team and return `teamtools\Entities\Team` object
     ```sh
-    $team       = Team::getByID('56582c53095747b64b9215f7');
-    $team->name = 'SDK awesome team';
+    try {
+        $team       = Team::getByID('56582c53095747b64b9215f7');
+        $team->name = 'SDK awesome team';
 
-    $response   = $team->save();
+        $response   = $team->save();
+    } catch (TTException $ex) {
+        echo $ex->getMessage();
+    }
     ```
 
 * calling methods with suffix `Raw` when working with static methods
@@ -332,8 +279,12 @@ Normally, related objects will be represented with ID in response. For example, 
 
 Example embedding subscription object into customer response:
 ```
-$customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription');
-var_dump($customer);
+try {
+    $customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription');
+    var_dump($customer);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 
 ```
 
@@ -348,7 +299,7 @@ Examples for include parameter are:
 - nesting data:
   - include=events,customer.invoices
 
-Some example of related object manipulations:
+Some example of related object manipulations (not wrapped in try - catch blocks for the sake of clarity):
 ```
 // retrieve all features from package that customer is currently subscribed to:
 $customer = Customer::getByID('5739c7fbbffebc4c0b8b4567', 'subscription.package.features');
@@ -378,13 +329,13 @@ var_dump($customers);
 
 ```
 
-
 ## Features
 
 #### Feature namespace
 To work with features, include the following namespace:
 ```sh
 use teamtools\Entities\Feature;
+use teamtools\Exceptions\TTException;   // this will be needed for error-handling
 ```
 
 #### Get feature attributes
@@ -411,8 +362,12 @@ $data = [
     'defaultValue' => ''
 ];
 
-$attribute = new Attribute($data);
-Feature::saveAttribute($attribute);
+try {
+    $attribute = new Attribute($data);
+    Feature::saveAttribute($attribute);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Update feature attributes
@@ -434,24 +389,41 @@ $data = [
     'defaultValue' => ''
 ];
 
-$attribute = new Attribute($data);
-Feature::saveAttribute($attribute);
+try {
+    $attribute = new Attribute($data);
+    Feature::saveAttribute($attribute);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Delete feature attribute
 
 ```sh
-Feature::deleteAttribute('5656c899bffebc47078b456e');
+try {
+    Feature::deleteAttribute('5656c899bffebc47078b456e');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 #### Get feature by ID
 ```sh
-$feature = Feature::getByID('5655c5f6bffebc40078b459e');
+try {
+    $feature = Feature::getByID('5655c5f6bffebc40078b459e');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Get feature by tag
 ```sh
-$feature = Feature::getByTag('master');
+try {
+    $feature = Feature::getByTag('master');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
+
 #### Create feature
 ```sh
 $data = [
@@ -460,8 +432,12 @@ $data = [
     'uniqueKey'   => 'feat-B'
 ];
 
-$feature = new Feature($data);
-$feature->save();
+try {
+    $feature = new Feature($data);
+    $feature->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Update feature
@@ -469,30 +445,46 @@ $feature->save();
 $feature              = Feature::getByID('5655c5f6bffebc40078b459e');
 $feature->description = 'Feature B - extended trial period.';
 
-$feature->save();
+try {
+    $feature->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Delete feature
 
 ```sh
-$feature = Feature::getByID('5655d765bffebc3f078b4595');
-$feature->delete();
+try {
+    $feature = Feature::getByID('5655d765bffebc3f078b4595');
+    $feature->delete();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Relation examples
 
 ##### Update feature dependencies
 ```sh
-$feature                 = Feature::getByID('5655c5edbffebc40078b459c');
-$feature->dependency_ids = ['5655c5f6bffebc40078b459e'];
-$feature->save();
+try {
+    $feature                 = Feature::getByID('5655c5edbffebc40078b459c');
+    $feature->dependency_ids = ['5655c5f6bffebc40078b459e'];
+    $feature->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ##### Remove feature dependencies
 ```sh
-$feature                 = Feature::getByID('5655c5edbffebc40078b459c');
-$feature->dependency_ids = [];
-$feature->save();
+try {
+    $feature                 = Feature::getByID('5655c5edbffebc40078b459c');
+    $feature->dependency_ids = [];
+    $feature->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ### Groups, Packages and Plans
@@ -518,7 +510,12 @@ $data = [
 ];
 
 $group = new Group($data);
-var_dump($group->save());
+
+try {
+    var_dump($group->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ``` 
 
 Example with default package and assign as default group:
@@ -531,13 +528,22 @@ $data = [
 ];
 
 $group = new Group($data);
-var_dump($group->save());
+
+try {
+    var_dump($group->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Retrieve packages by group ID:
 ```
-$group = Group::getByID('573301dbbffebc46088b4567');
-var_dump($group->getPackages());
+try {
+    $group = Group::getByID('573301dbbffebc46088b4567');
+    var_dump($group->getPackages());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Step 2: Create Packages
@@ -557,7 +563,12 @@ $data = [
 ];
 
 $package = new Package($data);
-var_dump($package->save());
+
+try {
+    var_dump($package->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Example creating package with features:
@@ -572,7 +583,12 @@ $data = [
 ];
 
 $package = new Package($data);
-var_dump($package->save());
+
+try {
+    var_dump($package->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Upon creation of Package, you will get packageId from teamtools.
@@ -611,7 +627,12 @@ $data = [
 ];
 
 $plan = new Plan($data);
-var_dump($plan->save());
+
+try {
+    var_dump($plan->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 Example creating flat plan:
 ```
@@ -663,12 +684,21 @@ $data = [
 ];
 
 $plan = new Plan($data);
-var_dump($plan->save());
+
+try {
+    var_dump($plan->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Get plan by ID:
 ```sh
-$plan = Plan::getByID('5673eff3bffebc4e078b4569');
+try {
+    $plan = Plan::getByID('5673eff3bffebc4e078b4569');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Start subscribing Customer to a Package
@@ -677,41 +707,57 @@ There are two ways to create customer subscription: via customer create / update
 
 Create subscription using customer update request (returns `customer` in response):
 ```
-$customer = Customer::getByID('5730838fbffebc290b8b4591');
-$customer->groupId = 'default';
+try {
+    $customer = Customer::getByID('5730838fbffebc290b8b4591');
+    $customer->groupId = 'default';
 
-var_dump($customer->save());
+    var_dump($customer->save());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Create subscription using dedicated endpoint (default group). Returns `subscription` in response:
 ```
-$customer = Customer::getByID('5730838fbffebc290b8b4591');
+try {
+    $customer = Customer::getByID('5730838fbffebc290b8b4591');
 
-$subscriptionData = [
-    'groupId' => 'default'
-];
+    $subscriptionData = [
+        'groupId' => 'default'
+    ];
 
-var_dump($customer->subscribe($subscriptionData));
+    var_dump($customer->subscribe($subscriptionData));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Create subscription using dedicated endpoint:
 ```
-$customer = Customer::getByID('5730838fbffebc290b8b4591');
+try {
+    $customer = Customer::getByID('5730838fbffebc290b8b4591');
 
-$subscriptionData = [
-    'groupId'     => '573301dbbffebc46088b4567',
-    'packageId'   => '5733052dbffebc46088b456b',
-    'manual'      => 'false',
-    'stripeToken' => 'xxxx'
-];
+    $subscriptionData = [
+        'groupId'     => '573301dbbffebc46088b4567',
+        'packageId'   => '5733052dbffebc46088b456b',
+        'manual'      => 'false',
+        'stripeToken' => 'xxxx'
+    ];
 
-var_dump($customer->subscribe($subscriptionData));
+    var_dump($customer->subscribe($subscriptionData));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 Retrieve customer's subscription
 ```
-$customer = Customer::getByID('5730838fbffebc290b8b4591');
-var_dump($customer->getSubscription());
+try {
+    $customer = Customer::getByID('5730838fbffebc290b8b4591');
+    var_dump($customer->getSubscription());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Unsubscribe customer from package
@@ -720,8 +766,12 @@ By calling following SDK function customer will be unsubscribed from current pac
 Return value: `subscription` object.
 
 ```
-$customer = Customer::getByID('56c73ce5bffebc47078b4619');
-var_dump($customer->unsubscribe());
+try {
+    $customer = Customer::getByID('56c73ce5bffebc47078b4619');
+    var_dump($customer->unsubscribe());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Add invoice item
@@ -736,8 +786,12 @@ $data = [
     'amount'      => 1800
 ];
 
-$subscription = Subscription::getByID('56cc46f2bffebc5b078b4571');
-$subscription->addInvoiceItem($data);
+try {
+    $subscription = Subscription::getByID('56cc46f2bffebc5b078b4571');
+    $subscription->addInvoiceItem($data);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ## Invoices
@@ -747,7 +801,11 @@ $subscription->addInvoiceItem($data);
 ```
 use teamtools\Entities\Invoice;
 
-$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+try {
+    $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Create invoice
@@ -772,7 +830,12 @@ $data = [
 ];
 
 $invoice = new Invoice($data);
-$invoice->save()
+
+try {
+    $invoice->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Settle invoice
@@ -782,9 +845,13 @@ Used to manually mark invoice as settled.
 ```
 use teamtools\Entities\Invoice;
 
-$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
-$invoice->settle();
-$invoice->save();
+try{
+    $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+    $invoice->settle();
+    $invoice->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 
 ```
 
@@ -795,25 +862,13 @@ Manually apply payment to invoice total. If applied amount is equal to invoice t
 ```
 use teamtools\Entities\Invoice;
 
-$invoice = Invoice::getByID('56cc581abffebc5b078b4575');
-$invoice->applyPayment(['amount' => 350]);
-$invoice->save();
-```
-
-
-#### Forward data from Stripe webhook
-In order to enable TeamTools to handle Stripe events, data received from Stripe should be forwarded to TeamTools. This is achieved by calling method `handleStripe()` in third-party endpoint which is defined as Stripe webhook.
-
-```
-use teamtools\TeamToolsClient;
-
-TeamToolsClient::initialize([
-    'client_id'     => 'iQ7Xz1x2A6',
-    'client_secret' => 'pOM6HnoC',
-    'salt'          => 'asdf'
-]);
-
-TeamToolsClient::handleStripe();
+try {
+    $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+    $invoice->applyPayment(['amount' => 350]);
+    $invoice->save();
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 #### Bulk insert and update
@@ -843,7 +898,11 @@ $customers = [
     ]
 ];
 
-var_dump(Customer::saveAll($customers, false));
+try {
+    var_dump(Customer::saveAll($customers, false));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 
 ```
 
@@ -879,13 +938,21 @@ $endusers = [
     ]
 ];
 
-var_dump(EndUser::saveAll($endusers, false));
+try {
+    var_dump(EndUser::saveAll($endusers, false));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ### Retrieve webhook event
 ```
-$webEvent = WebEvent::getByID('57334232bffebc77088b4574');
-var_dump($webEvent);
+try {
+    $webEvent = WebEvent::getByID('57334232bffebc77088b4574');
+    var_dump($webEvent);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
 ```
 
 ### Webhook event format examples
