@@ -18,12 +18,7 @@ class Invoice extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/settle');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/settle');
 
         if ($raw) {
             return (string) $response;
@@ -43,11 +38,7 @@ class Invoice extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/payment');
-        } catch (ClientException $ce) {
-            die((string) $ce->getResponse()->getBody());
-        }
+        $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/payment');
 
         if ($raw) {
             return (string) $response;

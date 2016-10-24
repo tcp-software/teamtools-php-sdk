@@ -19,12 +19,7 @@ class Subscription extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/addinvoiceitem');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/addinvoiceitem');
 
         if ($raw) {
             return (string) $response;

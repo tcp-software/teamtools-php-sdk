@@ -35,12 +35,7 @@ class Customer extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/endusers');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/endusers');
 
         if ($raw) {
             return (string) $response;
@@ -61,12 +56,7 @@ class Customer extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/events');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/events');
 
         if ($raw) {
             return (string) $response;
@@ -86,12 +76,7 @@ class Customer extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', $data, $manager::getContext() . '/' . $this->id . '/subscribe');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', $data, $manager::getContext() . '/' . $this->id . '/subscribe');
 
         if ($raw) {
             return (string) $response;
@@ -108,12 +93,7 @@ class Customer extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/unsubscribe');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/unsubscribe');
 
         if ($raw) {
             return (string) $response;
@@ -133,12 +113,7 @@ class Customer extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/subscription');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/subscription');
 
         if ($raw) {
             return (string) $response;
@@ -157,12 +132,7 @@ class Customer extends Entity
     {
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/restore');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/restore');
 
         if ($raw) {
             return (string) $response;
@@ -179,12 +149,7 @@ class Customer extends Entity
         $manager = static::$manager;
         $result   = [];
 
-        try {
-            $response = static::$client->doRequest('put', ['ids' => $ids], $manager::getContext().'/restore');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', ['ids' => $ids], $manager::getContext().'/restore');
 
         if ($raw) {
             return (string) $response;
@@ -205,16 +170,11 @@ class Customer extends Entity
         $manager = static::$manager;
         $result   = [];
 
-        try {
-            $response = static::$client->doRequest(
-                'put', 
-                ['enduserIds' => $ids, 'newCustomerId' => $newCustomerId], 
-                $manager::getContext() . '/' . $this->id . '/endusers'
-            );
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest(
+            'put', 
+            ['enduserIds' => $ids, 'newCustomerId' => $newCustomerId], 
+            $manager::getContext() . '/' . $this->id . '/endusers'
+        );
 
         if ($raw) {
             return (string) $response;
