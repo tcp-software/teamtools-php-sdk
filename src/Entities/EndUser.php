@@ -33,11 +33,11 @@ class EndUser extends Entity
         return new \ArrayIterator($result);
     }
 
-    public function restore($raw = false)
+    public static function restore($id, $raw = false)
     {
         $manager = static::$manager;
 
-        $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/restore');
+        $response = static::$client->doRequest('put', [], $manager::getContext() . '/' . $id . '/restore');
 
         if ($raw) {
             return (string) $response;

@@ -138,14 +138,13 @@ Deleting customer is done by instantiating it from database and calling its `del
 ```sh
 try {
     $customer = Customer::getByID('580a0ffcbffebc8b0e8b456aff');
-    $customer->delete();
+    var_dump($customer->delete());
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
 ```
 
 #### Migrate endusers to another customer
-Deleting customer is done by instantiating it from database and calling its `delete` method. Data is being soft-deleted.
 ```sh
 try {
     $customer = Customer::getByID('57e3a147bffebc75388b4571');
@@ -168,6 +167,48 @@ try {
     //migrate all endusers
 
     var_dump($customer->migrateEndusers($newCustomerId));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Get customer's endusers
+```
+try {
+    $customer = \teamtools\Entities\Customer::getByID('582191a10957473545bdff43');
+    $endUsers = $customer->getEndUsers();
+
+    var_dump($endUsers);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Get customer's events
+```
+try {
+    $customer = \teamtools\Entities\Customer::getByID('57fbe76c0957475156bdff59');
+    $events = $customer -> getEvents();
+
+    var_dump($events);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Restore deleted customer
+```
+try {
+    var_dump(Customer::restore('57fce361bffebc231c8b45cb'));
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Restore deleted end user
+```
+try {
+    var_dump(EndUser::restore('5822eaccbffebcaa088b458e'));
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -205,7 +246,8 @@ $data = [
     'editable'     => true,
     'searchable'   => true,
     'default'      => false,
-    'defaultValue' => ''
+    'defaultValue' => '',
+    'unique'       => false
 ];
 
 $attribute = new Attribute($data);
@@ -217,6 +259,21 @@ try {
 }
 ```
 
+##### Parameter descriptions
+
+Parameter name  |Type   | Description
+----------------|-------|-----------------------------------------
+name*           |string |Name of the attribute 
+prettyName*     |string |Human readable attribute name 
+type*           |string |Attribute type 
+description     |string |Description of attribute 
+required        |boolean|Is attribute required? 
+editable        |boolean|Is attribute editable? 
+searchable      |boolean|Is attribute searchable? 
+defaultValue    |string |Default value of the attribute 
+validation      |string |Validation for attribute value 
+unique          |boolean|If set to true, attribute value is unique
+
 #### Delete customer attribute
 
 Attribute can be deleted by supplying its `id` to static method `deleteAttribute` of corresponding entity. Attributes are soft-deleted, 
@@ -224,7 +281,60 @@ ie. record is marked as deleted and not physically removed from database.
 
 ```sh
 try {
-    Team::deleteAttribute('56571718095747cc4b9215f4');
+    Customer::deleteAttribute('56571718095747cc4b9215f4');
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Get enduser attributes
+
+Retrieve a list of attributes for an entity. Contains default and custom attributes, as well as description
+of relationships with other entities.
+
+```sh
+EndUser::getAttributes();
+```
+
+#### Create or update enduser attribute
+
+Custom attributes can be defined by instantiating `Attribute` object with corresponding properties and calling
+`saveAttribute` method on corresponding entity, as shown below. New custom attribute `testAttribute` will be created and
+attached to `EndUser`. This attribute will be included in validations when working with `EndUser` entity. For example:
+after creating this attribute, it won't be possible to create `EndUser` entity if `testAttribute` is not provided, since
+`testAttribute` is required custom attribute (`'required' => true`).
+
+```sh
+$data = [
+    'name'         => 'testAttribute',
+    'prettyName'   => 'Test attribute',
+    'type'         => 'text',
+    'description'  => "EndUser's test attribute",
+    'required'     => true,
+    'editable'     => true,
+    'searchable'   => true,
+    'default'      => false,
+    'defaultValue' => '',
+    'unique'       => false
+];
+
+$attribute = new Attribute($data);
+
+try {
+    EndUser::saveAttribute($attribute);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
+#### Delete enduser attribute
+
+Attribute can be deleted by supplying its `id` to static method `deleteAttribute` of corresponding entity. Attributes are soft-deleted, 
+ie. record is marked as deleted and not physically removed from database.
+
+```sh
+try {
+    EndUser::deleteAttribute('56571718095747cc4b9215f4');
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -236,32 +346,32 @@ There are two types of responses: PHP object and raw JSON response as API return
 PHP object (Entity or ArrayIterator when collections are returned) and raw response can be received by:
 
 * supplying `true` to instance methods
-  * Update team and return raw response
+  * Update customer and return raw response
     ```sh
     try {
-        $team       = Team::getByID('56582c53095747b64b9215f7');
-        $team->name = 'SDK awesome team';
+        $customer       = Customer::getByID('56582c53095747b64b9215f7');
+        $customer->name = 'SDK awesome customer';
 
-        $response   = $team->save(true);
+        $response   = $customer->save(true);
     } catch (TTException $ex) {
         echo $ex->getMessage();
     }
     ```
-  * Update team and return `teamtools\Entities\Team` object
+  * Update customer and return `teamtools\Entities\Customer` object
     ```sh
     try {
-        $team       = Team::getByID('56582c53095747b64b9215f7');
-        $team->name = 'SDK awesome team';
+        $customer       = Customer::getByID('56582c53095747b64b9215f7');
+        $customer->name = 'SDK awesome customer';
 
-        $response   = $team->save();
+        $response   = $customer->save();
     } catch (TTException $ex) {
         echo $ex->getMessage();
     }
     ```
 
 * calling methods with suffix `Raw` when working with static methods
-  * `$team = Team::getByID('565719f3095747906a9215f5');` - returns `teamtools\Entities\Team` object
-  * `$team = Team::getByIDRaw('565719f3095747906a9215f5');` - returns raw JSON response
+  * `$customer = Customer::getByID('565719f3095747906a9215f5');` - returns `teamtools\Entities\Customer` object
+  * `$customer = Customer::getByIDRaw('565719f3095747906a9215f5');` - returns raw JSON response
 
 ##### Methods with corresponding "raw response" methods:
 
@@ -599,6 +709,17 @@ Each Package requires a unique ID. You’ll provide this value in API requests t
 > In case there is only one Package created in the Group, this Package will get defaultPackageId.
 > If there are two or more Packages created in the Group, you'll need to decide which Package gets to be default.
 
+#### Retrieve all packages
+```
+try {
+    $packages = \teamtools\Entities\Package::getAll();
+    
+    var_dump($packages);
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
 
 #### Step 3: Create Plan
 
@@ -741,7 +862,8 @@ try {
         'groupId'     => '573301dbbffebc46088b4567',
         'packageId'   => '5733052dbffebc46088b456b',
         'manual'      => 'false',
-        'stripeToken' => 'xxxx'
+        'stripeToken' => 'xxxx',
+        'force'       => false
     ];
 
     var_dump($customer->subscribe($subscriptionData));
@@ -803,6 +925,8 @@ use teamtools\Entities\Invoice;
 
 try {
     $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
+
+    var_dump($invoice);
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -832,7 +956,7 @@ $data = [
 $invoice = new Invoice($data);
 
 try {
-    $invoice->save();
+    var_dump($invoice->save());
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -848,7 +972,7 @@ use teamtools\Entities\Invoice;
 try{
     $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
     $invoice->settle();
-    $invoice->save();
+    var_dump($invoice->save());
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -865,7 +989,7 @@ use teamtools\Entities\Invoice;
 try {
     $invoice = Invoice::getByID('56cc581abffebc5b078b4575');
     $invoice->applyPayment(['amount' => 350]);
-    $invoice->save();
+    var_dump($invoice->save());
 } catch (TTException $ex) {
     echo $ex->getMessage();
 }
@@ -912,12 +1036,13 @@ use teamtools\Entities\EndUser;
 
 $endusers = [
     [
-        'firstName' => 'Mary',
-        'lastName'  => 'Jones',
-        'email'     => 'customerCHANGE@email.com',
-        'phone'     => '+1234123412',
-        'country'   => 'USA',
-        'city'      => 'Chicago'
+        'firstName'  => 'Mary',
+        'lastName'   => 'Jones',
+        'email'      => 'customerCHANGE@email.com',
+        'phone'      => '+1234123412',
+        'country'    => 'USA',
+        'city'       => 'Chicago',
+        'customerId' => '5704f67cbffebc47078b4574'
     ],
     [
         'firstName' => 'Peter',
@@ -925,7 +1050,8 @@ $endusers = [
         'email'     => 'customer@email.com',
         'phone'     => '+1234123412',
         'country'   => 'USA',
-        'city'      => 'Chicago'
+        'city'      => 'Chicago',
+        'customerId' => '5704f67cbffebc47078b4574'
     ],
     [
         'id'        => '57050433bffebc46078b457f',
@@ -934,7 +1060,8 @@ $endusers = [
         'email'     => 'customer@email.com',
         'phone'     => '+1234123412',
         'country'   => 'USA',
-        'city'      => 'Chicago'
+        'city'      => 'Chicago',
+        'customerId' => '5704f67cbffebc47078b4574'
     ]
 ];
 
