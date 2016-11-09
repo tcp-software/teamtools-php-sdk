@@ -175,7 +175,7 @@ try {
 #### Get customer's endusers
 ```
 try {
-    $customer = \teamtools\Entities\Customer::getByID('582191a10957473545bdff43');
+    $customer = Customer::getByID('582191a10957473545bdff43');
     $endUsers = $customer->getEndUsers();
 
     var_dump($endUsers);
@@ -187,7 +187,7 @@ try {
 #### Get customer's events
 ```
 try {
-    $customer = \teamtools\Entities\Customer::getByID('57fbe76c0957475156bdff59');
+    $customer = Customer::getByID('57fbe76c0957475156bdff59');
     $events = $customer -> getEvents();
 
     var_dump($events);
@@ -712,7 +712,7 @@ Each Package requires a unique ID. You’ll provide this value in API requests t
 #### Retrieve all packages
 ```
 try {
-    $packages = \teamtools\Entities\Package::getAll();
+    $packages = Package::getAll();
     
     var_dump($packages);
 } catch (TTException $ex) {
