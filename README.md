@@ -95,7 +95,7 @@ try {
 ```
 
 #### Get customer
-Single team object can be retrived by its `id`.
+Single customer object can be retrived by its `id`.
 ```sh
 try {
     $customer = Customer::getByID('580a0ffcbffebc8b0e8b456a');
