@@ -7,5 +7,5 @@ use teamtools\Entities\Invoice;
 class InvoiceManager extends Manager
 {
     protected static $context   = 'invoices';
-    protected static $entityMap = Invoice::class;
+    protected static $entityMap = 'teamtools\Entities\Invoice';
 }

@@ -7,19 +7,18 @@ use teamtools\Managers\EndUserManager;
 
 class EndUser extends Entity
 {
-    protected static $manager = EndUserManager::class;
+    protected static $manager = 'teamtools\Managers\EndUserManager';
+    public static $relationMap = [
+        'customer' => 'teamtools\Entities\Customer',
+        'events'   => 'teamtools\Entities\Event'
+    ];
 
     public function getEvents($raw = false)
     {
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/events');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/events');
 
         if ($raw) {
             return (string) $response;
@@ -34,16 +33,11 @@ class EndUser extends Entity
         return new \ArrayIterator($result);
     }
 
-    public function restore($raw = false)
+    public static function restore($id, $raw = false)
     {
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('put', [], $manager::getContext().'/'.$this->id.'/restore');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', [], $manager::getContext() . '/' . $id . '/restore');
 
         if ($raw) {
             return (string) $response;
@@ -60,12 +54,7 @@ class EndUser extends Entity
         $manager = static::$manager;
         $result   = [];
 
-        try {
-            $response = static::$client->doRequest('put', ['ids' => $ids], $manager::getContext().'/restore');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('put', ['ids' => $ids], $manager::getContext().'/restore');
 
         if ($raw) {
             return (string) $response;

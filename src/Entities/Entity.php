@@ -33,19 +33,19 @@
             }
         }
 
+        public function __unset($name)
+        {
+            unset($this->attributes[$name]);
+        }
+
         public function save($raw = false)
         {
             $manager    = static::$manager;
 
-            try {
-                if (isset($this->attributes['id'])) {
-                    $response = static::$client->doRequest('put', $this->changed, $manager::getContext() . '/' . $this->attributes['id']);
-                } else {
-                    $response = static::$client->doRequest('post', $this->attributes, $manager::getContext() . '/');
-                }
-            } catch (ClientException $ce) {
-                $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-                return $response;
+            if (isset($this->attributes['id'])) {
+                $response = static::$client->doRequest('put', $this->changed, $manager::getContext() . '/' . $this->attributes['id']);
+            } else {
+                $response = static::$client->doRequest('post', $this->attributes, $manager::getContext() . '/');
             }
 
             if ($raw) {
@@ -62,11 +62,7 @@
         {
             $manager  = static::$manager;
 
-            try {
-                $response = static::$client->doRequest('post', ['data' => $data], $manager::getContext() . '/bulk');
-            } catch (ClientException $ce) {
-                $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            }
+            $response = static::$client->doRequest('post', ['data' => $data], $manager::getContext() . '/bulk');
 
             if ($raw) {
                 return (string) $response;
@@ -105,24 +101,28 @@
         {
             switch ($name) {
                 case 'getByID':
-                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, false, $include);
                     break;
 
                 case 'getByIDRaw':
-                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, true);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByID'], $arguments[0], static::$client, true, $include);
                     break;
 
                 case 'getByTag':
-                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, false, $include);
                     break;
 
                 case 'getByTagRaw':
-                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, true);
+                    $include = isset($arguments[1]) ? $arguments[1] : null;
+                    $result = call_user_func([static::$manager, 'getByTag'], $arguments[0], static::$client, true, $include);
                     break;
 
                 case 'getAll':
-                    $arguments['client'] = static::$client;
-                    $arguments['raw']    = false;
+                    $arguments['client']  = static::$client;
+                    $arguments['raw']     = false;
                     $result = call_user_func([static::$manager, 'getAll'], $arguments);
                     break;
 

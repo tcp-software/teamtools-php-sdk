@@ -3,13 +3,20 @@
 namespace teamtools;
 
 use teamtools\Entities\Entity;
+use teamtools\Exceptions\TTException;
+use teamtools\Exceptions\TTConnectionException;
+use teamtools\Exceptions\TTBadArgumentsException;
+use teamtools\Exceptions\TTServerException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\ConnectException;
 
 class TeamToolsClient
 {
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
+    const TEST_AUTH_DOMAIN        = 'https://develop-auth.dev.teamtools.io/';
+    const TEST_API_DOMAIN         = 'https://develop-api.dev.teamtools.io/';
 
     protected $authDomain   = 'https://auth.teamtools.io/';
     protected $apiDomain    = 'https://api.teamtools.io/';
@@ -70,8 +77,8 @@ class TeamToolsClient
         ];
 
         if (isset($config['test']) && $config['test']) {
-            $this->authDomain   = 'http://develop-auth.dev.teamtools.io/';
-            $this->apiDomain    = 'http://develop-api.dev.teamtools.io/';
+            $this->authDomain = self::TEST_AUTH_DOMAIN;
+            $this->apiDomain  = self::TEST_API_DOMAIN;
         }
 
         $response = $this->doRequest('post', $authData, 'access_token', 'auth');
@@ -89,9 +96,13 @@ class TeamToolsClient
         return $this->accessObject->access_token;
     }
 
-    public function doRequest($method, $data, $uri, $resource = 'api', $async = false)
+    public function doRequest($method, $data, $uri, $resource = 'api', $include = [])
     {
         $requestDataType = $method == 'get' ? 'query' : 'json';
+
+        if ($include) {
+            $data['include'] = $include;
+        }
 
         if ($resource == 'api') {
             $domain = $this->apiDomain;
@@ -100,7 +111,7 @@ class TeamToolsClient
             $domain = $this->authDomain;
         }
 
-        if ($async) {
+        /*if ($async) {
             $method .= 'Async';
             $promise = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
@@ -111,7 +122,20 @@ class TeamToolsClient
             $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
 
             return $response->getBody();
+        }*/
+
+        try {
+            $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        } catch (ConnectException $ce) {
+            throw new TTConnectionException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (ClientException $ce) {     
+            throw new TTBadArgumentsException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (ServerException $ce) {
+            throw new TTServerException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (\Exception $ex) {
+            throw new TTException($ex->getMessage());
         }
 
+        return $response->getBody();
     }
 }
