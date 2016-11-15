@@ -16,12 +16,7 @@ class Group extends Entity
         $result  = [];
         $manager = static::$manager;
 
-        try {
-            $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/packages');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/packages');
 
         if ($raw) {
             return (string) $response;

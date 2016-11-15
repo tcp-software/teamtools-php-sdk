@@ -3,8 +3,13 @@
 namespace teamtools;
 
 use teamtools\Entities\Entity;
+use teamtools\Exceptions\TTException;
+use teamtools\Exceptions\TTConnectionException;
+use teamtools\Exceptions\TTBadArgumentsException;
+use teamtools\Exceptions\TTServerException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\ConnectException;
 
 class TeamToolsClient
 {
@@ -119,7 +124,17 @@ class TeamToolsClient
             return $response->getBody();
         }*/
 
-        $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        try {
+            $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
+        } catch (ConnectException $ce) {
+            throw new TTConnectionException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (ClientException $ce) {     
+            throw new TTBadArgumentsException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (ServerException $ce) {
+            throw new TTServerException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (\Exception $ex) {
+            throw new TTException($ex->getMessage());
+        }
 
         return $response->getBody();
     }

@@ -14,6 +14,7 @@ class Attribute
     public $searchable;
     public $default;
     public $defaultValue;
+    public $unique;
     private static $immutable = ['name', 'type', 'default'];
 
     public function __construct($data)

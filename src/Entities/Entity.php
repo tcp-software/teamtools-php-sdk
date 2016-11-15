@@ -42,15 +42,10 @@
         {
             $manager    = static::$manager;
 
-            try {
-                if (isset($this->attributes['id'])) {
-                    $response = static::$client->doRequest('put', $this->changed, $manager::getContext() . '/' . $this->attributes['id']);
-                } else {
-                    $response = static::$client->doRequest('post', $this->attributes, $manager::getContext() . '/');
-                }
-            } catch (ClientException $ce) {
-                $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-                return $response;
+            if (isset($this->attributes['id'])) {
+                $response = static::$client->doRequest('put', $this->changed, $manager::getContext() . '/' . $this->attributes['id']);
+            } else {
+                $response = static::$client->doRequest('post', $this->attributes, $manager::getContext() . '/');
             }
 
             if ($raw) {
@@ -67,11 +62,7 @@
         {
             $manager  = static::$manager;
 
-            try {
-                $response = static::$client->doRequest('post', ['data' => $data], $manager::getContext() . '/bulk');
-            } catch (ClientException $ce) {
-                $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            }
+            $response = static::$client->doRequest('post', ['data' => $data], $manager::getContext() . '/bulk');
 
             if ($raw) {
                 return (string) $response;

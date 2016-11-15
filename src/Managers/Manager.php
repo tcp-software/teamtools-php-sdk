@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\ClientException;
 use teamtools\Entities\Attribute;
 use teamtools\TeamToolsClient;
 use teamtools\Entities\Entity;
+use teamtools\Exceptions\TTException;
 
 class Manager
 {
@@ -20,12 +21,7 @@ class Manager
 
     public static function getByID($id, TeamToolsClient $client, $raw = false, $include = null)
     {
-        try {
-            $response = $client->doRequest('get', [], static::$context . '/' . $id, 'api', $include);
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = $client->doRequest('get', [], static::$context . '/' . $id, 'api', $include);
 
         if ($raw) {
             return (string) $response;
@@ -45,12 +41,7 @@ class Manager
     {
         $result   = [];
 
-        try {
-            $response = $client->doRequest('get', [], static::$context . '/tag/' . $tag, 'api', $include);
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = $client->doRequest('get', [], static::$context . '/tag/' . $tag, 'api', $include);
 
         if ($raw) {
             return (string) $response;
@@ -84,12 +75,7 @@ class Manager
 
         $include = isset($args[0]['include']) ? $args[0]['include'] : null;
 
-        try {
-            $response = $args['client']->doRequest('get', $query, static::$context, 'api', $include);
-        } catch (ClientException $ce) {
-            $response = $args['raw'] ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = $args['client']->doRequest('get', $query, static::$context, 'api', $include);
 
         if ($args['raw']) {
             return (string) $response;
@@ -113,12 +99,7 @@ class Manager
     {
         $result = [];
 
-        try {
-            $response = $client->doRequest('get', [], static::$context.'/attributes');
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
-        }
+        $response = $client->doRequest('get', [], static::$context.'/attributes');
 
         if ($raw) {
             return (string) $response;
@@ -136,15 +117,10 @@ class Manager
 
     public static function saveAttribute(Attribute $attribute, $client, $raw = false)
     {
-        try {
-            if ($attribute->id) {
-                $response = $client->doRequest('put', $attribute->prepareForUpdate(), static::$context . '/attributes/' . $attribute->id);
-            } else {
-                $response = $client->doRequest('post', get_object_vars($attribute), static::$context . '/attributes/');
-            }
-        } catch (ClientException $ce) {
-            $response = $raw ? (string) $ce->getResponse()->getBody() : json_decode($ce->getResponse()->getBody());
-            return $response;
+        if ($attribute->id) {
+            $response = $client->doRequest('put', $attribute->prepareForUpdate(), static::$context . '/attributes/' . $attribute->id);
+        } else {
+            $response = $client->doRequest('post', get_object_vars($attribute), static::$context . '/attributes/');
         }
 
         if ($raw) {
