@@ -9,8 +9,9 @@ class Invoice extends Entity
 {
     protected static $manager = 'teamtools\Managers\InvoiceManager';
     public static $relationMap = [
-        'payments' => 'teamtools\Entities\Payment',
-        'refunds'  => 'teamtools\Entities\Refund'
+        'payments'     => 'teamtools\Entities\Payment',
+        'refunds'      => 'teamtools\Entities\Refund',
+        'subscription' => 'teamtools\Entities\Subscription',
     ];
 
     public function settle($raw = false)
