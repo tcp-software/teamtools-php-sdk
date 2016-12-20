@@ -53,5 +53,45 @@ class Invoice extends Entity
 
         return new \ArrayIterator($result);
     }
+
+    public function getRefunds($raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/refunds');
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
+
+    public function getPayments($raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/payments');
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
 }
 
