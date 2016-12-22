@@ -995,6 +995,21 @@ try {
 }
 ```
 
+#### Get payments / refunds
+
+Retrieve refunds or payments for invoice:
+
+```
+try {
+    $invoice = Invoice::getByID('57e3a348bffebc83318b457e');
+
+    var_dump($invoice->getRefunds());
+    var_dump($invoice->getPayments());
+} catch (TTException $ex) {
+    echo $ex->getMessage();
+}
+```
+
 #### Bulk insert and update
 
 Customers and Endusers support bulk operations like inserting and updating multiple records in single request. For this operation a structure named "data" should be provided, which contains array of entities to be persisted. If array element contains element "id", entity with that specific ID will be updated. Otherwise, entity will be inserted. All validations are still valid, like when working with single entity.
