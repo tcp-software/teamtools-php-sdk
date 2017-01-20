@@ -7,5 +7,5 @@ use teamtools\Entities\Refund;
 class RefundManager extends Manager
 {
     protected static $context   = 'refunds';
-    protected static $entityMap = 'teamtools\Entities\Refund';
+    protected static $entityMap = Refund::class;
 }

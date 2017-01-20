@@ -6,10 +6,10 @@ use teamtools\Managers\PlanManager;
 
 class Plan extends Entity
 {
-    protected static $manager = 'teamtools\Managers\PlanManager';
+    protected static $manager = PlanManager::class;
 
     public static $relationMap = [
-        'subscription' => 'teamtools\Entities\Subscription',
-        'package'      => 'teamtools\Entities\Package'
+        'subscription' => Subscription::class,
+        'package'      => Package::class
     ];
 }

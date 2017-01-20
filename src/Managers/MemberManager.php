@@ -7,5 +7,5 @@ use teamtools\Entities\Member;
 class MemberManager extends Manager
 {
     protected static $context   = 'members';
-    protected static $entityMap = 'teamtools\Entities\Member';
+    protected static $entityMap = Member::class;
 }

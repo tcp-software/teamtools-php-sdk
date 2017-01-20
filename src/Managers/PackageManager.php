@@ -7,5 +7,5 @@ use teamtools\Entities\Package;
 class PackageManager extends Manager
 {
     protected static $context   = 'packages';
-    protected static $entityMap = 'teamtools\Entities\Package';
+    protected static $entityMap = Package::class;
 }
