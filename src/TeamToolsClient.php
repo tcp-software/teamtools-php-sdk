@@ -15,11 +15,8 @@ class TeamToolsClient
 {
 
     const STRIPE_HANDLER_ENDPOINT = 'stripe';
-    // const TEST_AUTH_DOMAIN        = 'https://develop-auth.dev.teamtools.io/';
-    // const TEST_API_DOMAIN         = 'https://develop-api.dev.teamtools.io/';
-
-    const TEST_AUTH_DOMAIN        = 'http://auth.teamtools.local/';
-    const TEST_API_DOMAIN         = 'http://api.teamtools.local/';
+    const TEST_AUTH_DOMAIN        = 'https://develop-auth.dev.teamtools.io/';
+    const TEST_API_DOMAIN         = 'https://develop-api.dev.teamtools.io/';
 
     protected $authDomain   = 'https://auth.teamtools.io/';
     protected $apiDomain    = 'https://api.teamtools.io/';
