@@ -13,7 +13,7 @@
     "teamtools"
   ],
   "require": {
-    "php": ">=5.5",
+    "php": ">=5.6",
     "guzzlehttp/guzzle": "~6.0"
   },
   "autoload": {
