@@ -127,11 +127,11 @@ class TeamToolsClient
         try {
             $response = $this->guzzleClient->$method($domain . $uri, [$requestDataType => $data]);
         } catch (ConnectException $ce) {
-            throw new TTConnectionException(json_decode($ce->getResponse()->getBody())->error->message);
+            throw new TTConnectionException($ce->getMessage());
         } catch (ClientException $ce) {     
             throw new TTBadArgumentsException(json_decode($ce->getResponse()->getBody())->error->message);
-        } catch (ServerException $ce) {
-            throw new TTServerException(json_decode($ce->getResponse()->getBody())->error->message);
+        } catch (ServerException $se) {
+            throw new TTServerException($se->getMessage());
         } catch (\Exception $ex) {
             throw new TTException($ex->getMessage());
         }
