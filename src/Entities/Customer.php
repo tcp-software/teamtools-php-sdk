@@ -7,11 +7,11 @@ use teamtools\Managers\CustomerManager;
 
 class Customer extends Entity
 {
-    protected static $manager = 'teamtools\Managers\CustomerManager';
+    protected static $manager = CustomerManager::class;
     public static $relationMap = [
-        'subscription' => 'teamtools\Entities\Subscription',
-        'invoices'     => 'teamtools\Entities\Invoice',
-        'users'        => 'teamtools\Entities\EndUser',
+        'subscription' => Subscription::class,
+        'invoices'     => Invoice::class,
+        'users'        => EndUser::class,
     ];
 
     public function save($raw = false)

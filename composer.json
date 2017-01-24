@@ -13,8 +13,8 @@
     "teamtools"
   ],
   "require": {
-    "php": ">=5.4.0",
-    "guzzlehttp/guzzle": "~5.3.1"
+    "php": ">=5.6",
+    "guzzlehttp/guzzle": "~6.0"
   },
   "autoload": {
     "psr-4": {

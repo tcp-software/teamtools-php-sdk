@@ -7,5 +7,5 @@ use teamtools\Entities\Feature;
 class FeatureManager extends Manager
 {
     protected static $context   = 'features';
-    protected static $entityMap = 'teamtools\Entities\Feature';
+    protected static $entityMap = Feature::class;
 }

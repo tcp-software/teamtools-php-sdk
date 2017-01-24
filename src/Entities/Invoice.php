@@ -7,11 +7,11 @@ use GuzzleHttp\Exception\ClientException;
 
 class Invoice extends Entity
 {
-    protected static $manager = 'teamtools\Managers\InvoiceManager';
+    protected static $manager = InvoiceManager::class;
     public static $relationMap = [
-        'payments'     => 'teamtools\Entities\Payment',
-        'refunds'      => 'teamtools\Entities\Refund',
-        'subscription' => 'teamtools\Entities\Subscription',
+        'payments'     => Payment::class,
+        'refunds'      => Refund::class,
+        'subscription' => Subscription::class,
     ];
 
     public function settle($raw = false)

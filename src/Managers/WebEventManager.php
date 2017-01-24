@@ -7,5 +7,5 @@ use teamtools\Entities\WebEvent;
 class WebEventManager extends Manager
 {
     protected static $context   = 'webevents';
-    protected static $entityMap = 'teamtools\Entities\WebEvent';
+    protected static $entityMap = WebEvent::class;
 }
