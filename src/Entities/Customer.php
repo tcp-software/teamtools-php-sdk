@@ -119,14 +119,13 @@ class Customer extends Entity
             return (string) $response;
         }
 
-        if ($raw) {
-            return (string) $response;
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
         }
 
-        $responseObject = json_decode($response);
-        $data           = get_object_vars($responseObject->data);
-
-        return new Subscription($data);
+        return new \ArrayIterator($result);
     }
 
     public static function restore($id, $raw = false)
