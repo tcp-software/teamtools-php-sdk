@@ -7,11 +7,11 @@ use GuzzleHttp\Exception\ClientException;
 
 class Invoice extends Entity
 {
-    protected static $manager = 'teamtools\Managers\InvoiceManager';
+    protected static $manager = InvoiceManager::class;
     public static $relationMap = [
-        'payments'     => 'teamtools\Entities\Payment',
-        'refunds'      => 'teamtools\Entities\Refund',
-        'subscription' => 'teamtools\Entities\Subscription',
+        'payments'     => Payment::class,
+        'refunds'      => Refund::class,
+        'subscription' => Subscription::class,
     ];
 
     public function settle($raw = false)
@@ -40,6 +40,46 @@ class Invoice extends Entity
         $manager = static::$manager;
 
         $response = static::$client->doRequest('put', $data, $manager::getContext().'/'.$this->id.'/payment');
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
+
+    public function getRefunds($raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/refunds');
+
+        if ($raw) {
+            return (string) $response;
+        }
+
+        $responseObject = json_decode($response);
+
+        foreach ($responseObject->data as $item) {
+            $result[] = $item;
+        }
+
+        return new \ArrayIterator($result);
+    }
+
+    public function getPayments($raw = false)
+    {
+        $result  = [];
+        $manager = static::$manager;
+
+        $response = static::$client->doRequest('get', [], $manager::getContext().'/'.$this->id.'/payments');
 
         if ($raw) {
             return (string) $response;

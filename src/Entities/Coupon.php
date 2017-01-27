@@ -6,5 +6,5 @@ use teamtools\Managers\CouponManager;
 
 class Coupon extends Entity
 {
-    protected static $manager = 'teamtools\Managers\CouponManager';
+    protected static $manager = CouponManager::class;
 }

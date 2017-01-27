@@ -6,9 +6,9 @@ use teamtools\Managers\MemberManager;
 
 class Member extends Entity
 {
-    protected static $manager = 'teamtools\Managers\MemberManager';
+    protected static $manager = MemberManager::class;
 
     public static $relationMap = [
-        'teams' => 'teamtools\Entities\Team'
+        'teams' => Team::class
     ];
 }

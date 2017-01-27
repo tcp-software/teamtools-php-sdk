@@ -7,5 +7,5 @@ use teamtools\Entities\Subscription;
 class SubscriptionManager extends Manager
 {
     protected static $context   = 'subscriptions';
-    protected static $entityMap = 'teamtools\Entities\Subscription';
+    protected static $entityMap = Subscription::class;
 }
